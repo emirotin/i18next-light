@@ -26,7 +26,10 @@ describe('Translator', () => {
               foo: 'bar',
               nest: '$t(nestedArray)',
             },
-            nestedArray: [{ a: 'b', c: 'd' }, { a: 'b', c: 'd' }],
+            nestedArray: [
+              { a: 'b', c: 'd' },
+              { a: 'b', c: 'd' },
+            ],
           },
         },
       });
@@ -35,14 +38,10 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          contextSeparator: '_',
-          keySeparator: '.',
-          ns: 'translation',
-          defaultNS: 'translation',
           interpolation: {},
           returnObjects: true,
         },
@@ -63,7 +62,16 @@ describe('Translator', () => {
       { args: ['test', { context: 'unknown', count: 2 }], expected: 'tests_en' },
       { args: ['test', { context: 'male', count: 1 }], expected: 'test_male_en' },
       { args: ['test', { context: 'male', count: 2 }], expected: 'tests_male_en' },
-      { args: ['nest'], expected: { foo: 'bar', nest: [{ a: 'b', c: 'd' }, { a: 'b', c: 'd' }] } },
+      {
+        args: ['nest'],
+        expected: {
+          foo: 'bar',
+          nest: [
+            { a: 'b', c: 'd' },
+            { a: 'b', c: 'd' },
+          ],
+        },
+      },
 
       // interpolation and nesting on defaultValue
       {

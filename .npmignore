@@ -9,8 +9,6 @@ assets/
 .eslintrc
 .gitignore
 bower.json
-gulpfile.js
 karma.conf.js
-sample.html
 .codeclimate.yml
 tsconfig.json

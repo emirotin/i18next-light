@@ -1,19 +1,3 @@
-// http://lea.verou.me/2016/12/resolve-promises-externally-with-this-one-weird-trick/
-export function defer() {
-  let res;
-  let rej;
-
-  const promise = new Promise((resolve, reject) => {
-    res = resolve;
-    rej = reject;
-  });
-
-  promise.resolve = res;
-  promise.reject = rej;
-
-  return promise;
-}
-
 export function makeString(object) {
   if (object == null) return '';
   /* eslint prefer-template: 0 */
@@ -79,28 +63,6 @@ export function getPathWithDefaults(data, defaultData, key) {
   }
   // Fallback to default values
   return getPath(defaultData, key);
-}
-
-export function deepExtend(target, source, overwrite) {
-  /* eslint no-restricted-syntax: 0 */
-  for (const prop in source) {
-    if (prop in target) {
-      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
-      if (
-        typeof target[prop] === 'string' ||
-        target[prop] instanceof String ||
-        typeof source[prop] === 'string' ||
-        source[prop] instanceof String
-      ) {
-        if (overwrite) target[prop] = source[prop];
-      } else {
-        deepExtend(target[prop], source[prop], overwrite);
-      }
-    } else {
-      target[prop] = source[prop];
-    }
-  }
-  return target;
 }
 
 export function regexEscape(str) {

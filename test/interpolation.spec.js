@@ -69,79 +69,13 @@ describe('Interpolator', () => {
         options: { interpolation: {} },
         expected: {
           escapeValue: true,
-          prefix: '{{',
-          suffix: '}}',
-          formatSeparator: ',',
-          unescapePrefix: '-',
-          unescapeSuffix: '',
-          nestingPrefix: '\\$t\\(',
-          nestingSuffix: '\\)',
         },
       },
       {
         options: {},
         expected: {
           escapeValue: true,
-          prefix: '{{',
-          suffix: '}}',
-          formatSeparator: ',',
-          unescapePrefix: '-',
-          unescapeSuffix: '',
-          nestingPrefix: '\\$t\\(',
-          nestingSuffix: '\\)',
         },
-      },
-      {
-        description: 'uses and regex escapes prefix and suffix',
-        options: {
-          interpolation: {
-            prefix: '(*(',
-            suffix: ')*)',
-            prefixEscaped: '\\(\\^\\(',
-            suffixEscaped: ')\\^\\)',
-          },
-        },
-        expected: { prefix: '\\(\\*\\(', suffix: '\\)\\*\\)' },
-      },
-      {
-        description: 'uses prefixEscaped and suffixEscaped if prefix and suffix not provided',
-        options: { interpolation: { prefixEscaped: '<<', suffixEscaped: '>>' } },
-        expected: { prefix: '<<', suffix: '>>' },
-      },
-      {
-        description: 'uses unescapePrefix if provided',
-        options: { interpolation: { unescapePrefix: '=>' } },
-        expected: { unescapePrefix: '=>', unescapeSuffix: '' },
-      },
-      {
-        description: 'uses unescapeSuffix if provided',
-        options: { interpolation: { unescapeSuffix: '<=' } },
-        expected: { unescapePrefix: '', unescapeSuffix: '<=' },
-      },
-      {
-        description: 'uses unescapeSuffix if both unescapePrefix and unescapeSuffix are provided',
-        options: { interpolation: { unescapePrefix: '=>', unescapeSuffix: '<=' } },
-        expected: { unescapePrefix: '', unescapeSuffix: '<=' },
-      },
-      {
-        description: 'uses and regex escapes nestingPrefix and nestingSuffix',
-        options: {
-          interpolation: {
-            nestingPrefix: 'nest(',
-            nestingSuffix: ')nest',
-            nestingPrefixEscaped: 'neste\\(',
-            nestingSuffixEscaped: '\\)neste',
-          },
-        },
-        expected: { nestingPrefix: 'nest\\(', nestingSuffix: '\\)nest' },
-      },
-      {
-        description:
-          'uses nestingPrefixEscaped and nestingSuffixEscaped if nestingPrefix and nestingSuffix not provided',
-        options: {
-          interpolation: { nestingPrefixEscaped: 'neste\\(', nestingSuffixEscaped: '\\)neste' },
-        },
-        expected: { nestingPrefix: 'neste\\(', nestingSuffix: '\\)neste' },
       },
       {
         description: 'uses maxReplaces if provided',
@@ -203,30 +137,6 @@ describe('Interpolator', () => {
       const test = tests[0];
 
       expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
-    });
-  });
-
-  describe('interpolate() - with formatter using a special formatSeparator', () => {
-    let ip;
-
-    before(() => {
-      ip = new Interpolator({
-        interpolation: {
-          formatSeparator: '|',
-          format: function(value, format, lng) {
-            if (format === 'uppercase') return value.toUpperCase();
-            return value;
-          },
-        },
-      });
-    });
-
-    var tests = [{ args: ['test {{test | uppercase}}', { test: 'up' }], expected: 'test UP' }];
-
-    tests.forEach(test => {
-      it('correctly interpolates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
-      });
     });
   });
 
@@ -359,49 +269,6 @@ describe('Interpolator', () => {
     tests.forEach(test => {
       it('correctly nests for ' + JSON.stringify(test.args) + ' args', () => {
         expect(ip.nest.apply(ip, test.args)).to.eql(test.expected);
-      });
-    });
-  });
-
-  describe('interpolate() - backwards compatible', () => {
-    var ip;
-
-    before(() => {
-      ip = new Interpolator({
-        interpolation: {
-          escapeValue: true,
-          prefix: '__',
-          suffix: '__',
-          unescapeSuffix: 'HTML',
-        },
-      });
-    });
-
-    var tests = [
-      { args: ['test __test__', { test: '123' }], expected: 'test 123' },
-      {
-        args: ['test __test__ a __bit.more__', { test: '123', bit: { more: '456' } }],
-        expected: 'test 123 a 456',
-      },
-      { args: ['test __ test __', { test: '123' }], expected: 'test 123' },
-      { args: ['test __test.deep__', { test: { deep: '123' } }], expected: 'test 123' },
-      {
-        args: ['test __test__', { test: '<a>foo</a>' }],
-        expected: 'test &lt;a&gt;foo&lt;&#x2F;a&gt;',
-      },
-      {
-        args: ['test __test.deep__', { test: { deep: '<a>foo</a>' } }],
-        expected: 'test &lt;a&gt;foo&lt;&#x2F;a&gt;',
-      },
-      {
-        args: ['test __test.deepHTML__', { test: { deep: '<a>foo</a>' } }],
-        expected: 'test <a>foo</a>',
-      },
-    ];
-
-    tests.forEach(test => {
-      it('correctly interpolates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
       });
     });
   });

@@ -1,3 +1,25 @@
+# Differences
+
+No backend, no multiple languages, no namespaces, no fancy resources loading: only accepts plain mapping `key => i18n string`. Handles keys resolution for plurals and context though.
+
+No save/update missing keys
+
+Key separator — unused, only one level of keys is handled.
+Interpolation — always `{{}}`
+Plural/context separator — always `_`.
+Nesting — always `$t()`
+Format separator — always `,`
+
+No special CI mode handling.
+
+`lng` is only used for the plural detection
+
+`simplifyPluralSuffix` is always `true`
+
+No whitelist
+
+Only format v3 is supported
+
 # i18next: learn once - translate everywhere [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Awesome%20i18next:%20learn%20once%20-%20translate%20everywhere%20-%20the%20internationalization%20ecosystem%20&url=https://github.com/i18next/i18next&via=jamuhl&hashtags=i18n,javascript,dev)
 
 [![CircleCI](https://circleci.com/gh/i18next/i18next.svg?style=svg)](https://circleci.com/gh/i18next/i18next)

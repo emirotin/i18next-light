@@ -41,15 +41,11 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          keySeparator: '.',
-          contextSeparator: '_',
           returnObjects: true,
-          ns: ['common', 'special', 'withContext'],
-          defaultNS: 'common',
           interpolation: {
             interpolateResult: true,
             interpolateDefaultValue: true,

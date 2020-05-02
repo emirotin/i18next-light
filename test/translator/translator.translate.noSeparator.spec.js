@@ -9,34 +9,27 @@ describe('Translator', () => {
     var t;
 
     before(() => {
-      const rs = new ResourceStore(
-        {
-          en: {
-            translation: {
-              'test: with a sentence. or more text': 'test_en',
-            },
-          },
-          de: {
-            translation: {
-              'test: with a sentence. or more text': 'test_de',
-            },
+      const rs = new ResourceStore({
+        en: {
+          translation: {
+            'test: with a sentence. or more text': 'test_en',
           },
         },
-        { keySeparator: false },
-      );
+        de: {
+          translation: {
+            'test: with a sentence. or more text': 'test_de',
+          },
+        },
+      });
       const lu = new LanguageUtils({ fallbackLng: 'en' });
       t = new Translator(
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          ns: ['translation'],
-          defaultNS: 'translation',
-          nsSeparator: false,
-          keySeparator: false,
           interpolation: {
             interpolateResult: true,
             interpolateDefaultValue: true,

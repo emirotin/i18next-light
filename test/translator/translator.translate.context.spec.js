@@ -30,11 +30,10 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          contextSeparator: '_',
           interpolation: {
             interpolateResult: true,
             interpolateDefaultValue: true,
