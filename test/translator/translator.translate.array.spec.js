@@ -13,9 +13,15 @@ describe('Translator', () => {
         en: {
           translation: {
             test: ['test_en_1', 'test_en_2', '{{myVar}}'],
-            flagList: [['basic1', 'Basic1'], ['simple1', 'Simple1']],
+            flagList: [
+              ['basic1', 'Basic1'],
+              ['simple1', 'Simple1'],
+            ],
             search: {
-              flagList: [['basic', 'Basic'], ['simple', 'Simple']],
+              flagList: [
+                ['basic', 'Basic'],
+                ['simple', 'Simple'],
+              ],
             },
             keyArray: ['hello world {{count}}', 'hey {{count}}'],
             keyArray_plural: ['hello world plural {{count}}', 'hey plural {{count}}'],
@@ -27,14 +33,11 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
           returnObjects: true,
-          ns: 'translation',
-          defaultNS: 'translation',
-          keySeparator: '.',
           interpolation: {
             // interpolateResult: true,
             // interpolateDefaultValue: true,
@@ -58,7 +61,10 @@ describe('Translator', () => {
       },
       {
         args: [['search.flagList', 'flagList'], {}],
-        expected: [['basic', 'Basic'], ['simple', 'Simple']],
+        expected: [
+          ['basic', 'Basic'],
+          ['simple', 'Simple'],
+        ],
       },
       {
         args: ['keyArray', { count: 1 }],

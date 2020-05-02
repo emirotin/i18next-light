@@ -72,21 +72,4 @@ describe('i18next', () => {
       });
     });
   });
-
-  describe('i18next - functions', () => {
-    describe('getFixedT', () => {
-      it('it should have lng, ns on t', () => {
-        const t = i18next.getFixedT('de', 'common');
-        expect(t.lng).to.equal('de');
-        expect(t.ns).to.equal('common');
-      });
-      it('should handle default value', () => {
-        const t = i18next.getFixedT(null, null);
-        const translatedKey = t('key', 'default');
-        const translatedSecondKey = t('key', { defaultValue: 'default' });
-        expect(translatedKey).to.equal('default');
-        expect(translatedSecondKey).to.equal('default');
-      });
-    });
-  });
 });

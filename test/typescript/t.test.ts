@@ -113,15 +113,8 @@ function interpolation(t: TFunction) {
   t('keyWithCount', { count: 5 }); // -> "5 items"
   t('keyWithCount', { count: 100 }); // -> "100 items"
 
-  t('key1_interval', { postProcess: 'interval', count: 1 }); // -> "one item"
-  t('key1_interval', { postProcess: 'interval', count: 4 }); // -> "a few items"
-  t('key1_interval', { postProcess: 'interval', count: 100 }); // -> "a lot of items"
-
   // not matching into a range it will fallback to
   // the regular plural form
-  t('key2_interval', { postProcess: 'interval', count: 1 }); // -> "one item"
-  t('key2_interval', { postProcess: 'interval', count: 4 }); // -> "a few items"
-  t('key2_interval', { postProcess: 'interval', count: 100 }); // -> "100 items"
   t('friend', { context: 'male', count: 1 }); // -> "A boyfriend"
   t('friend', { context: 'female', count: 100 }); // -> "100 girlfriends"
   t('tree', { returnObjects: true, something: 'gold' });

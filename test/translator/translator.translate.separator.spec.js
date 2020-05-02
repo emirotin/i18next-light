@@ -26,7 +26,6 @@ describe('Translator', () => {
           },
         },
         {
-          keySeparator: '::',
           nsSeparator: ':::',
         },
       );
@@ -35,11 +34,10 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          keySeparator: '::',
           nsSeparator: ':::',
           interpolation: {
             interpolateResult: true,
@@ -55,17 +53,17 @@ describe('Translator', () => {
       { args: ['translation:::test'], expected: 'test_en' },
       { args: ['translation2:::test'], expected: 'test2_en' },
       { args: ['translation:::deep::test'], expected: 'testDeep_en' },
-      { args: ['translation:test', { nsSeparator: ':', keySeparator: '.' }], expected: 'test_en' },
+      { args: ['translation:test', { nsSeparator: ':' }], expected: 'test_en' },
       {
-        args: ['translation2:test', { nsSeparator: ':', keySeparator: '.' }],
+        args: ['translation2:test', { nsSeparator: ':' }],
         expected: 'test2_en',
       },
       {
-        args: ['translation:deep.test', { nsSeparator: ':', keySeparator: '.' }],
+        args: ['translation:deep.test', { nsSeparator: ':' }],
         expected: 'testDeep_en',
       },
-      { args: ['translation:::test::single', { keySeparator: false }], expected: 'single_en' },
-      { args: ['translation:::test.single', { keySeparator: false }], expected: 'single_en' },
+      { args: ['translation:::test::single'], expected: 'single_en' },
+      { args: ['translation:::test.single'], expected: 'single_en' },
     ];
 
     tests.forEach(test => {

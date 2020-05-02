@@ -1,6 +1,15 @@
 import * as utils from './utils.js';
 import baseLogger from './logger.js';
 
+const prefix = '{{';
+const suffix = '}}';
+const formatSeparator = ',';
+const unescapePrefix = '-';
+const unescapeSuffix = '';
+const nestingPrefix = utils.regexEscape('$t(');
+const nestingSuffix = utils.regexEscape(')');
+const nestingOptionsSeparator = ',';
+
 class Interpolator {
   constructor(options = {}) {
     this.logger = baseLogger.create('interpolator');
@@ -21,27 +30,6 @@ class Interpolator {
     this.useRawValueToEscape =
       iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
 
-    this.prefix = iOpts.prefix ? utils.regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
-    this.suffix = iOpts.suffix ? utils.regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
-
-    this.formatSeparator = iOpts.formatSeparator
-      ? iOpts.formatSeparator
-      : iOpts.formatSeparator || ',';
-
-    this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
-    this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
-
-    this.nestingPrefix = iOpts.nestingPrefix
-      ? utils.regexEscape(iOpts.nestingPrefix)
-      : iOpts.nestingPrefixEscaped || utils.regexEscape('$t(');
-    this.nestingSuffix = iOpts.nestingSuffix
-      ? utils.regexEscape(iOpts.nestingSuffix)
-      : iOpts.nestingSuffixEscaped || utils.regexEscape(')');
-
-    this.nestingOptionsSeparator = iOpts.nestingOptionsSeparator
-      ? iOpts.nestingOptionsSeparator
-      : iOpts.nestingOptionsSeparator || ',';
-
     this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000;
 
     this.alwaysFormat = iOpts.alwaysFormat !== undefined ? iOpts.alwaysFormat : false;
@@ -56,16 +44,12 @@ class Interpolator {
 
   resetRegExp() {
     // the regexp
-    const regexpStr = `${this.prefix}(.+?)${this.suffix}`;
-    this.regexp = new RegExp(regexpStr, 'g');
-
-    const regexpUnescapeStr = `${this.prefix}${this.unescapePrefix}(.+?)${this.unescapeSuffix}${
-      this.suffix
-    }`;
-    this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
-
-    const nestingRegexpStr = `${this.nestingPrefix}(.+?)${this.nestingSuffix}`;
-    this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
+    this.regexp = new RegExp(`${prefix}(.+?)${suffix}`, 'g');
+    this.regexpUnescape = new RegExp(
+      `${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`,
+      'g',
+    );
+    this.nestingRegexp = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
   }
 
   interpolate(str, data, lng, options) {
@@ -82,14 +66,14 @@ class Interpolator {
     }
 
     const handleFormat = key => {
-      if (key.indexOf(this.formatSeparator) < 0) {
+      if (key.indexOf(formatSeparator) < 0) {
         const path = utils.getPathWithDefaults(data, defaultData, key);
         return this.alwaysFormat ? this.format(path, undefined, lng) : path;
       }
 
-      const p = key.split(this.formatSeparator);
+      const p = key.split(formatSeparator);
       const k = p.shift().trim();
-      const f = p.join(this.formatSeparator).trim();
+      const f = p.join(formatSeparator).trim();
 
       return this.format(utils.getPathWithDefaults(data, defaultData, k), f, lng, options);
     };
@@ -154,12 +138,11 @@ class Interpolator {
     let value;
 
     let clonedOptions = { ...options };
-    clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
     delete clonedOptions.defaultValue; // assert we do not get a endless loop on interpolating defaultValue again and again
 
     // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
     function handleHasOptions(key, inheritedOptions) {
-      const sep = this.nestingOptionsSeparator;
+      const sep = nestingOptionsSeparator;
       if (key.indexOf(sep) < 0) return key;
 
       const c = key.split(new RegExp(`${sep}[ ]*{`));
@@ -197,8 +180,8 @@ class Interpolator {
        *   - Not t(a, b, {"keyA": "valueA", "keyB": "valueB"})
        */
       let doReduce = false;
-      if (match[0].includes(this.formatSeparator) && !/{.*}/.test(match[1])) {
-        [match[1], ...formatters] = match[1].split(this.formatSeparator).map(elem => elem.trim());
+      if (match[0].includes(formatSeparator) && !/{.*}/.test(match[1])) {
+        [match[1], ...formatters] = match[1].split(formatSeparator).map(elem => elem.trim());
         doReduce = true;
       }
 

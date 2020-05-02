@@ -15,7 +15,7 @@ import Interpolator from '../../src/Interpolator';
 
 describe('Translator', () => {
   describe('translate()', () => {
-    var t;
+    let t;
 
     before(() => {
       const rs = new ResourceStore({
@@ -38,12 +38,10 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          defaultNS: 'translation',
-          ns: 'translation',
           interpolation: {
             interpolateResult: true,
             interpolateDefaultValue: true,

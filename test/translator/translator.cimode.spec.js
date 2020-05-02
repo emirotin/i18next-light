@@ -26,7 +26,7 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
@@ -42,25 +42,19 @@ describe('Translator', () => {
 
     var tests = [
       {
-        args: [
-          'translation:test',
-          { appendNamespaceToCIMode: false, ns: 'translation', nsSeparator: ':' },
-        ],
+        args: ['translation:test', {}],
         expected: 'test',
       },
       {
-        args: ['test', { appendNamespaceToCIMode: false, ns: 'translation', nsSeparator: ':' }],
+        args: ['test', {}],
         expected: 'test',
       },
       {
-        args: [
-          'translation:test',
-          { appendNamespaceToCIMode: true, ns: 'translation', nsSeparator: ':' },
-        ],
+        args: ['translation:test', {}],
         expected: 'translation:test',
       },
       {
-        args: ['test', { appendNamespaceToCIMode: true, ns: 'translation', nsSeparator: ':' }],
+        args: ['test'],
         expected: 'translation:test',
       },
     ];

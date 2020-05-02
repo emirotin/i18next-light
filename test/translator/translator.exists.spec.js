@@ -29,12 +29,10 @@ describe('Translator', () => {
         {
           resourceStore: rs,
           languageUtils: lu,
-          pluralResolver: new PluralResolver(lu, { prepend: '_', simplifyPluralSuffix: true }),
+          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
-          defaultNS: 'translation',
-          ns: 'translation',
           interpolation: {
             interpolateResult: true,
             interpolateDefaultValue: true,
