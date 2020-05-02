@@ -13,5 +13,4 @@ gulpfile.js
 karma.conf.js
 sample.html
 .codeclimate.yml
-.coveralls.yml
 tsconfig.json
