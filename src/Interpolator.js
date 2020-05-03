@@ -15,31 +15,13 @@ class Interpolator {
     this.logger = baseLogger.create('interpolator');
 
     this.options = options;
-    this.format = (options.interpolation && options.interpolation.format) || (value => value);
-    this.init(options);
-  }
-
-  /* eslint no-param-reassign: 0 */
-  init(options = {}) {
-    if (!options.interpolation) options.interpolation = { escapeValue: true };
-
-    const iOpts = options.interpolation;
-
-    this.escape = iOpts.escape !== undefined ? iOpts.escape : utils.escape;
-    this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
-    this.useRawValueToEscape =
-      iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
-
-    this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000;
-
-    this.alwaysFormat = iOpts.alwaysFormat !== undefined ? iOpts.alwaysFormat : false;
-
-    // the regexp
+    this.format = options.interpolationFormat || (value => value);
+    this.maxReplaces = options.maxReplaces || 1000;
     this.resetRegExp();
   }
 
   reset() {
-    if (this.options) this.init(this.options);
+    this.resetRegExp();
   }
 
   resetRegExp() {
@@ -57,31 +39,23 @@ class Interpolator {
     let value;
     let replaces;
 
-    const defaultData =
-      (this.options && this.options.interpolation && this.options.interpolation.defaultVariables) ||
-      {};
-
     function regexSafe(val) {
       return val.replace(/\$/g, '$$$$');
     }
 
     const handleFormat = key => {
       if (key.indexOf(formatSeparator) < 0) {
-        const path = utils.getPathWithDefaults(data, defaultData, key);
-        return this.alwaysFormat ? this.format(path, undefined, lng) : path;
+        return utils.getPath(data, key);
       }
 
       const p = key.split(formatSeparator);
       const k = p.shift().trim();
       const f = p.join(formatSeparator).trim();
 
-      return this.format(utils.getPathWithDefaults(data, defaultData, k), f, lng, options);
+      return this.format(utils.getPath(data, k), f, lng, options);
     };
 
     this.resetRegExp();
-
-    const missingInterpolationHandler =
-      (options && options.missingInterpolationHandler) || this.options.missingInterpolationHandler;
 
     replaces = 0;
     // unescape if has unescapePrefix/Suffix
@@ -89,14 +63,9 @@ class Interpolator {
     while ((match = this.regexpUnescape.exec(str))) {
       value = handleFormat(match[1].trim());
       if (value === undefined) {
-        if (typeof missingInterpolationHandler === 'function') {
-          const temp = missingInterpolationHandler(str, match, options);
-          value = typeof temp === 'string' ? temp : '';
-        } else {
-          this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-          value = '';
-        }
-      } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
+        this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
+        value = '';
+      } else if (typeof value !== 'string') {
         value = utils.makeString(value);
       }
       str = str.replace(match[0], regexSafe(value));
@@ -112,17 +81,12 @@ class Interpolator {
     while ((match = this.regexp.exec(str))) {
       value = handleFormat(match[1].trim());
       if (value === undefined) {
-        if (typeof missingInterpolationHandler === 'function') {
-          const temp = missingInterpolationHandler(str, match, options);
-          value = typeof temp === 'string' ? temp : '';
-        } else {
-          this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-          value = '';
-        }
-      } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
+        this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
+        value = '';
+      } else if (typeof value !== 'string') {
         value = utils.makeString(value);
       }
-      value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
+      value = regexSafe(utils.escape(value));
       str = str.replace(match[0], value);
       this.regexp.lastIndex = 0;
       replaces++;
@@ -202,7 +166,7 @@ class Interpolator {
       }
 
       // Nested keys should not be escaped by default #854
-      // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
+      // value = regexSafe(utils.escape(value));
       str = str.replace(match[0], value);
       this.regexp.lastIndex = 0;
     }

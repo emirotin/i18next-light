@@ -4,8 +4,6 @@ const contextSeparator = '_';
 
 class Translator {
   constructor({ pluralResolver, interpolator }, options = {}) {
-    super();
-
     this.pluralResolver = pluralResolver;
     this.interpolator = interpolator;
 
@@ -20,11 +18,13 @@ class Translator {
   }
 
   translate(keys, options) {
-    if (typeof options !== 'object' && this.options.overloadTranslationOptionHandler) {
-      /* eslint prefer-rest-params: 0 */
-      options = this.options.overloadTranslationOptionHandler(arguments);
+    if (typeof options === 'string') {
+      options = {
+        defaultValue: options,
+      };
+    } else if (!options) {
+      options = {};
     }
-    if (!options) options = {};
 
     // non valid keys handling
     if (keys === undefined || keys === null /* || keys === ''*/) return '';
@@ -39,34 +39,14 @@ class Translator {
 
     const resType = Object.prototype.toString.apply(res);
     const noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
-    const joinArrays =
-      options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays;
 
     // object
     const handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
     const handleAsObject =
       typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
-    if (
-      handleAsObjectInI18nFormat &&
-      res &&
-      handleAsObject &&
-      noObject.indexOf(resType) < 0 &&
-      !(typeof joinArrays === 'string' && resType === '[object Array]')
-    ) {
-      if (!options.returnObjects && !this.options.returnObjects) {
-        this.logger.warn('accessing an object - but returnObjects options is not enabled!');
-        return this.options.returnedObjectHandler
-          ? this.options.returnedObjectHandler(resUsedKey, res, options)
-          : `key '${key} (${this.language})' returned an object instead of string.`;
-      }
-    } else if (
-      handleAsObjectInI18nFormat &&
-      typeof joinArrays === 'string' &&
-      resType === '[object Array]'
-    ) {
-      // array special treatment
-      res = res.join(joinArrays);
-      if (res) res = this.extendTranslation(res, keys, options);
+    if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0) {
+      this.logger.warn('accessing an object');
+      return `key '${key} (${this.language})' returned an object instead of string.`;
     } else {
       // string, empty or null
       let usedDefault = false;
@@ -93,24 +73,18 @@ class Translator {
 
       // extend
       res = this.extendTranslation(res, keys, options, resolved);
-
-      // parseMissingKeyHandler
-      if (usedKey && this.options.parseMissingKeyHandler)
-        res = this.options.parseMissingKeyHandler(res);
     }
 
     // return
     return res;
   }
 
-  extendTranslation(res, key, options, resolved) {
+  extendTranslation(res, _key, options, _resolved) {
     // i18next.parsing
-    if (options.interpolation) this.interpolator.init(options);
+    this.interpolator.reset();
 
     // interpolate
     let data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-    if (this.options.interpolation.defaultVariables)
-      data = { ...this.options.interpolation.defaultVariables, ...data };
     res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
 
     // nesting

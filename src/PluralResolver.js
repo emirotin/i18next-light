@@ -19,10 +19,8 @@ const rules = sets.reduce((acc, set) => {
 const separator = '_';
 
 class PluralResolver {
-  constructor(languageUtils, options = {}) {
+  constructor(languageUtils) {
     this.languageUtils = languageUtils;
-    this.options = options;
-
     this.logger = baseLogger.create('pluralResolver');
   }
 

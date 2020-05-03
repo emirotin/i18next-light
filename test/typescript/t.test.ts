@@ -100,7 +100,6 @@ function interpolation(t: TFunction) {
 
   t('keyEscaped', {
     myVar: '<img />',
-    interpolation: { escapeValue: false },
   });
   // -> "no danger <img />" (obviously could be dangerous)
 
@@ -117,19 +116,11 @@ function interpolation(t: TFunction) {
   // the regular plural form
   t('friend', { context: 'male', count: 1 }); // -> "A boyfriend"
   t('friend', { context: 'female', count: 100 }); // -> "100 girlfriends"
-  t('tree', { returnObjects: true, something: 'gold' });
+  t('tree', { something: 'gold' });
   // -> { res: 'added gold' }
 
-  t('array', { returnObjects: true });
+  t('array', {});
   // -> ['a', 'b', 'c']
-  t('arrayJoin', { joinArrays: '+' });
-  // -> "line1+line2+line3"
-
-  t('arrayJoinWithInterpolation', {
-    myVar: 'interpolate',
-    joinArrays: ' ',
-  });
-  // -> "you can interpolate"
 
   t('arrayOfObjects.0.name');
   // -> "tom"

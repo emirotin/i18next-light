@@ -29,7 +29,6 @@ describe('Translator', () => {
             interpolateResult: true,
             interpolateDefaultValue: true,
             interpolateKey: true,
-            escapeValue: true,
           },
         },
       );
@@ -39,20 +38,11 @@ describe('Translator', () => {
     var tests = [
       { args: ['translation:test', { var: 'a&b' }], expected: 'text a&amp;b' },
       {
-        args: ['translation:test', { var: 'a&b', interpolation: { escapeValue: false } }],
+        // todo; use different key
+        args: ['translation:test', { var: 'a&b' }],
         expected: 'text a&b',
       },
       { args: ['translation:test', { var: ['a', 'b'] }], expected: 'text a,b' },
-      {
-        args: [
-          'translation:test',
-          {
-            var: ['a', 'b'],
-            interpolation: { useRawValueToEscape: true, escape: value => value.join('-') },
-          },
-        ],
-        expected: 'text a-b',
-      },
     ];
 
     tests.forEach(test => {

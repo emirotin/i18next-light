@@ -37,7 +37,6 @@ describe('Translator', () => {
           interpolator: new Interpolator(),
         },
         {
-          returnObjects: true,
           interpolation: {
             // interpolateResult: true,
             // interpolateDefaultValue: true,
@@ -52,12 +51,8 @@ describe('Translator', () => {
       { args: ['translation:test.0'], expected: 'test_en_1' },
       { args: ['translation:test.2', { myVar: 'test' }], expected: 'test' },
       {
-        args: ['translation:test', { myVar: 'test', joinArrays: '+' }],
-        expected: 'test_en_1+test_en_2+test',
-      },
-      {
-        args: ['translation:test', { myVar: 'test', joinArrays: '' }],
-        expected: 'test_en_1test_en_2test',
+        args: ['translation:test', { myVar: 'test' }],
+        expected: 'test_en_1,test_en_2,test',
       },
       {
         args: [['search.flagList', 'flagList'], {}],

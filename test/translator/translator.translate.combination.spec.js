@@ -43,7 +43,6 @@ describe('Translator', () => {
         },
         {
           interpolation: {},
-          returnObjects: true,
         },
       );
       t.changeLanguage('en');
