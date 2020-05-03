@@ -2,9 +2,14 @@ import baseLogger from './logger.js';
 
 import Translator from './Translator.js';
 import languageUtils from './LanguageUtils.js';
-import Interpolator from './Interpolator.js';
 
-import defaults from './defaults.js';
+const defaults = {
+  debug: false,
+  resources: {},
+  maxReplaces: 1000,
+  interpolationFormat: (value, _format, _lng, _options) => value,
+  logger: null,
+};
 
 const rtlLngs = [
   'ar',
@@ -69,33 +74,27 @@ const rtlLngs = [
   'sam',
 ];
 
-class I18n {
-  constructor(options = {}) {
-    this.options = { ...defaults, ...options };
-    this.logger = baseLogger;
+const I18n = (options = {}) => {
+  options = { ...defaults, ...options };
+  const logger = baseLogger;
+  baseLogger.init(options.logger, options);
 
-    if (!this.options.lng) {
-      this.logger.warn('init: no lng is defined');
-    }
-
-    baseLogger.init(this.options.logger, this.options);
-
-    this.translator = new Translator(this.options);
+  if (!options.lng) {
+    this.logger.warn('init: no lng is defined');
   }
 
-  t(...args) {
-    return this.translator.translate(...args);
-  }
+  const translator = new Translator(options);
 
-  exists(...args) {
-    return this.translator.exists(...args);
-  }
+  return {
+    t: (...args) => translator.translate(...args),
+    exists: (...args) => this.translator.exists(...args),
+    dir: lng =>
+      !lng
+        ? 'rtl'
+        : rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0
+        ? 'rtl'
+        : 'ltr',
+  };
+};
 
-  dir(lng) {
-    if (!lng) return 'rtl';
-
-    return rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
-  }
-}
-
-export default new I18n();
+export default I18n;

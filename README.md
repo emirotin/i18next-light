@@ -1,5 +1,9 @@
 # Differences
 
+Different API:
+
+`const i18n = I18n({ ... })`
+
 No backend, no multiple languages, no namespaces, no fancy resources loading: only accepts plain mapping `key => i18n string`. Handles keys resolution for plurals and context though.
 
 No save/update missing keys
