@@ -1,41 +1,35 @@
 import baseLogger from './logger.js';
+import pluralResolver from './PluralResolver.js';
+import Interpolator from './Interpolator.js';
 
 const contextSeparator = '_';
 
 class Translator {
-  constructor({ pluralResolver, interpolator }, options = {}) {
-    this.pluralResolver = pluralResolver;
-    this.interpolator = interpolator;
-
+  constructor(options = {}) {
+    this.interpolator = new Interpolator(options);
     this.options = options;
-
     this.logger = baseLogger.create('translator');
   }
 
-  exists(key, options = { interpolation: {} }) {
+  exists(key, options) {
     const resolved = this.resolve(key, options);
     return resolved && resolved.res !== undefined;
   }
 
-  translate(keys, options) {
+  translate(keys, options = {}) {
     if (typeof options === 'string') {
       options = {
         defaultValue: options,
       };
-    } else if (!options) {
-      options = {};
     }
 
     // non valid keys handling
-    if (keys === undefined || keys === null /* || keys === ''*/) return '';
+    if (keys == null) return '';
     if (!Array.isArray(keys)) keys = [String(keys)];
-
-    const lng = this.options.lng;
 
     // resolve from store
     const resolved = this.resolve(keys, options);
     let res = resolved && resolved.res;
-    const resUsedKey = (resolved && resolved.usedKey) || key;
 
     const resType = Object.prototype.toString.apply(res);
     const noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
@@ -46,7 +40,7 @@ class Translator {
       typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
     if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0) {
       this.logger.warn('accessing an object');
-      return `key '${key} (${this.language})' returned an object instead of string.`;
+      return `key '${key} (${this.options.lng})' returned an object instead of string.`;
     } else {
       // string, empty or null
       let usedDefault = false;
@@ -57,7 +51,7 @@ class Translator {
         usedDefault = true;
 
         if (options.count !== undefined) {
-          const suffix = this.pluralResolver.getSuffix(lng, options.count);
+          const suffix = pluralResolver.getSuffix(this.options.lng, options.count);
           res = options[`defaultValue${suffix}`];
         }
         if (!res) res = options.defaultValue;
@@ -68,31 +62,26 @@ class Translator {
       }
 
       if (usedKey || usedDefault) {
-        this.logger.log('missingKey', lng, key, res);
+        this.logger.log('missingKey', this.options.lng, key, res);
       }
 
       // extend
-      res = this.extendTranslation(res, keys, options, resolved);
+      res = this.extendTranslation(res, options);
     }
 
     // return
     return res;
   }
 
-  extendTranslation(res, _key, options, _resolved) {
-    // i18next.parsing
-    this.interpolator.reset();
+  extendTranslation(res, options) {
+    let newRes = this.interpolator.interpolate(res, options, this.options.lng, options);
 
-    // interpolate
-    let data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-    res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
-
-    // nesting
-    if (options.nest !== false) {
-      res = this.interpolator.nest(res, (...args) => this.translate(...args), options);
-    }
-
-    return res;
+    return this.interpolator.nest(
+      newRes,
+      (...args) => this.translate(...args),
+      this.options.lng,
+      options,
+    );
   }
 
   resolve(keys, options = {}) {
@@ -110,7 +99,7 @@ class Translator {
       const keyVariants = [key];
 
       const pluralSuffix =
-        needsPluralHandling && this.pluralResolver.getSuffix(this.options.lng, options.count);
+        needsPluralHandling && pluralResolver.getSuffix(this.options.lng, options.count);
 
       let finalKey = key;
       // fallback for plural if context not found

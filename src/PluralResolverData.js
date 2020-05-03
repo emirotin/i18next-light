@@ -204,3 +204,17 @@ export const rulesPluralsTypes = {
   21: n => Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0),
   22: n => Number(n === 1 ? 0 : n === 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3),
 };
+
+export const rules = sets.reduce((acc, set) => {
+  Object.assign(
+    acc,
+    set.lngs.reduce((acc, l) => {
+      acc[l] = {
+        numbers: set.nr,
+        plurals: rulesPluralsTypes[set.fc],
+      };
+      return acc;
+    }, {}),
+  );
+  return acc;
+}, {});

@@ -8,34 +8,28 @@ describe('i18next.translation.formatting', () => {
       {
         lng: 'en',
         resources: {
-          en: {
-            translation: {
-              oneFormatterTest: 'The following text is uppercased: $t(key5, uppercase)',
-              anotherOneFormatterTest: 'The following text is underscored: $t(key6, underscore)',
-              twoFormattersTest:
-                'The following text is uppercased: $t(key5, uppercase). The following text is underscored: $t(key5, underscore)',
-              twoFormattersTogetherTest:
-                'The following text is uppercased, underscored, then uri component encoded: $t(key7, uppercase, underscore, encodeuricomponent)',
-              oneFormatterUsingAnotherFormatterTest:
-                'The following text is lowercased: $t(twoFormattersTogetherTest, lowercase)',
-              missingTranslationTest:
-                'No text will be shown when the translation key is missing: $t(, uppercase)',
-              key5: 'Here is some text',
-              key6: 'Here is some text with numb3r5',
-              key7: 'Here is some: text? with, (punctuation)',
-              withSpace: ' there',
-              keyWithNesting: 'hi$t(withSpace)',
-            },
-          },
+          oneFormatterTest: 'The following text is uppercased: $t(key5, uppercase)',
+          anotherOneFormatterTest: 'The following text is underscored: $t(key6, underscore)',
+          twoFormattersTest:
+            'The following text is uppercased: $t(key5, uppercase). The following text is underscored: $t(key5, underscore)',
+          twoFormattersTogetherTest:
+            'The following text is uppercased, underscored, then uri component encoded: $t(key7, uppercase, underscore, encodeuricomponent)',
+          oneFormatterUsingAnotherFormatterTest:
+            'The following text is lowercased: $t(twoFormattersTogetherTest, lowercase)',
+          missingTranslationTest:
+            'No text will be shown when the translation key is missing: $t(, uppercase)',
+          key5: 'Here is some text',
+          key6: 'Here is some text with numb3r5',
+          key7: 'Here is some: text? with, (punctuation)',
+          withSpace: ' there',
+          keyWithNesting: 'hi$t(withSpace)',
         },
-        interpolation: {
-          format: function(value, format, lng) {
-            if (format === 'uppercase') return value.toUpperCase();
-            if (format === 'lowercase') return value.toLowerCase();
-            if (format === 'underscore') return value.replace(/\s+/g, '_');
-            if (format === 'encodeuricomponent') return encodeURIComponent(value);
-            return value;
-          },
+        interpolationFormat: (value, format, _lng) => {
+          if (format === 'uppercase') return value.toUpperCase();
+          if (format === 'lowercase') return value.toLowerCase();
+          if (format === 'underscore') return value.replace(/\s+/g, '_');
+          if (format === 'encodeuricomponent') return encodeURIComponent(value);
+          return value;
         },
       },
       () => {

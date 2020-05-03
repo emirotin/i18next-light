@@ -1,14 +1,8 @@
-import PluralResolver from '../src/PluralResolver';
-import LanguageUtils from '../src/LanguageUtils';
+import pluralResolver from '../src/PluralResolver';
 
 describe('PluralResolver', () => {
   describe('needsPlural()', () => {
-    let pr;
-
-    before(() => {
-      let lu = new LanguageUtils({ fallbackLng: 'en' });
-      pr = new PluralResolver(lu);
-    });
+    const pr = pluralResolver;
 
     var tests = [
       { args: ['en'], expected: true },
@@ -49,12 +43,7 @@ describe('PluralResolver', () => {
   });
 
   describe('getSuffix()', () => {
-    var cu, pr;
-
-    before(() => {
-      cu = new LanguageUtils({ fallbackCode: 'en' });
-      pr = new PluralResolver(cu);
-    });
+    const pr = pluralResolver;
 
     var tests = [
       { args: ['en', 0], expected: 'plural' },
@@ -214,12 +203,7 @@ describe('PluralResolver', () => {
   });
 
   describe('getPluralFormsOfKey()', () => {
-    let pr;
-
-    before(() => {
-      let lu = new LanguageUtils({ fallbackLng: 'en' });
-      pr = new PluralResolver(lu);
-    });
+    const pr = pluralResolver;
 
     var tests = [
       { args: ['en', 'key'], expected: ['key', 'key_plural'] },
