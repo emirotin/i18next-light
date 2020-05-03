@@ -64,13 +64,11 @@ describe('Interpolator', () => {
 
     before(() => {
       ip = new Interpolator({
-        interpolation: {
-          format: function(value, format, lng) {
-            if (format === 'uppercase') return value.toUpperCase();
-            if (format === 'lowercase') return value.toLowerCase();
-            if (format === 'throw') throw new Error('Formatter error');
-            return value;
-          },
+        interpolationFormat: (value, format, _lng) => {
+          if (format === 'uppercase') return value.toUpperCase();
+          if (format === 'lowercase') return value.toLowerCase();
+          if (format === 'throw') throw new Error('Formatter error');
+          return value;
         },
       });
     });
@@ -102,11 +100,9 @@ describe('Interpolator', () => {
 
     before(() => {
       ip = new Interpolator({
-        interpolation: {
-          format: function(value, format, lng) {
-            if (format === 'uppercase') return value.toUpperCase();
-            return value.toLowerCase();
-          },
+        interpolationFormat: (value, format, _lng) => {
+          if (format === 'uppercase') return value.toUpperCase();
+          return value.toLowerCase();
         },
       });
     });
@@ -176,48 +172,23 @@ describe('Interpolator', () => {
 
     var tests = [
       {
-        args: [
-          'test $t(test)',
-          function() {
-            return 'success';
-          },
-        ],
+        args: ['test $t(test)', () => 'success'],
         expected: 'test success',
       },
       {
-        args: [
-          '$t(test, {"key": "success"})',
-          function(key, opts) {
-            return 'test ' + opts.key;
-          },
-        ],
+        args: ['$t(test, {"key": "success"})', (key, opts) => 'test ' + opts.key],
         expected: 'test success',
       },
       {
-        args: [
-          "$t(test, {'key': 'success'})",
-          function(key, opts) {
-            return 'test ' + opts.key;
-          },
-        ],
+        args: ["$t(test, {'key': 'success'})", (key, opts) => 'test ' + opts.key],
         expected: 'test success',
       },
       {
-        args: [
-          '$t(test, is, {"key": "success"})',
-          function(key, opts) {
-            return 'test, is ' + opts.key;
-          },
-        ],
+        args: ['$t(test, is, {"key": "success"})', (key, opts) => 'test, is ' + opts.key],
         expected: 'test, is success',
       },
       {
-        args: [
-          '$t(test, is, ok)',
-          function() {
-            return 'test, is, ok';
-          },
-        ],
+        args: ['$t(test, is, ok)', () => 'test, is, ok'],
         expected: 'test, is, ok',
       },
     ];

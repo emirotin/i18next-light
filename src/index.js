@@ -1,8 +1,9 @@
 import baseLogger from './logger.js';
+
 import Translator from './Translator.js';
-import LanguageUtils from './LanguageUtils.js';
-import PluralResolver from './PluralResolver.js';
+import languageUtils from './LanguageUtils.js';
 import Interpolator from './Interpolator.js';
+
 import defaults from './defaults.js';
 
 const rtlLngs = [
@@ -71,25 +72,15 @@ const rtlLngs = [
 class I18n {
   constructor(options = {}) {
     this.options = { ...defaults, ...options };
-    this.services = {};
     this.logger = baseLogger;
 
-    this.init();
-  }
-
-  init() {
     if (!this.options.lng) {
       this.logger.warn('init: no lng is defined');
     }
 
-    // init services
-    baseLogger.init(null, this.options);
+    baseLogger.init(this.options.logger, this.options);
 
-    this.languageUtils = new LanguageUtils(this.options);
-
-    const pluralResolver = new PluralResolver(this.languageUtils);
-    const interpolator = new Interpolator(this.options);
-    this.translator = new Translator({ pluralResolver, interpolator }, this.options);
+    this.translator = new Translator(this.options);
   }
 
   t(...args) {
@@ -103,7 +94,7 @@ class I18n {
   dir(lng) {
     if (!lng) return 'rtl';
 
-    return rtlLngs.indexOf(this.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
+    return rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
   }
 }
 

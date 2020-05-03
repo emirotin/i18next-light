@@ -3,4 +3,5 @@ export default {
   resources: {},
   maxReplaces: 1000,
   interpolationFormat: (value, format, lng, options) => value,
+  logger: null,
 };

@@ -179,248 +179,49 @@
 
   var baseLogger = new Logger();
 
-  function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray$1(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-  function _unsupportedIterableToArray$1(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$1(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen); }
-
-  function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-  var contextSeparator = '_';
-
-  var Translator = /*#__PURE__*/function () {
-    function Translator(_ref) {
-      var pluralResolver = _ref.pluralResolver,
-          interpolator = _ref.interpolator;
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      _classCallCheck(this, Translator);
-
-      this.pluralResolver = pluralResolver;
-      this.interpolator = interpolator;
-      this.options = options;
-      this.logger = baseLogger.create('translator');
-    }
-
-    _createClass(Translator, [{
-      key: "exists",
-      value: function exists(key) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-          interpolation: {}
-        };
-        var resolved = this.resolve(key, options);
-        return resolved && resolved.res !== undefined;
-      }
-    }, {
-      key: "translate",
-      value: function translate(keys, options) {
-        if (typeof options === 'string') {
-          options = {
-            defaultValue: options
-          };
-        } else if (!options) {
-          options = {};
-        } // non valid keys handling
-
-
-        if (keys === undefined || keys === null
-        /* || keys === ''*/
-        ) return '';
-        if (!Array.isArray(keys)) keys = [String(keys)];
-        var lng = this.options.lng; // resolve from store
-
-        var resolved = this.resolve(keys, options);
-        var res = resolved && resolved.res;
-        var resUsedKey = resolved && resolved.usedKey || key;
-        var resType = Object.prototype.toString.apply(res);
-        var noObject = ['[object Number]', '[object Function]', '[object RegExp]']; // object
-
-        var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
-        var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
-
-        if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0) {
-          this.logger.warn('accessing an object');
-          return "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
-        } else {
-          // string, empty or null
-          var usedDefault = false;
-          var usedKey = false; // fallback value
-
-          if (res === undefined && options.defaultValue !== undefined) {
-            usedDefault = true;
-
-            if (options.count !== undefined) {
-              var suffix = this.pluralResolver.getSuffix(lng, options.count);
-              res = options["defaultValue".concat(suffix)];
-            }
-
-            if (!res) res = options.defaultValue;
-          }
-
-          if (res === undefined) {
-            usedKey = true;
-            res = key;
-          }
-
-          if (usedKey || usedDefault) {
-            this.logger.log('missingKey', lng, key, res);
-          } // extend
-
-
-          res = this.extendTranslation(res, keys, options, resolved);
-        } // return
-
-
-        return res;
-      }
-    }, {
-      key: "extendTranslation",
-      value: function extendTranslation(res, _key, options, _resolved) {
-        var _this = this;
-
-        // i18next.parsing
-        this.interpolator.reset(); // interpolate
-
-        var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-        res = this.interpolator.interpolate(res, data, options.lng || this.language, options); // nesting
-
-        if (options.nest !== false) {
-          res = this.interpolator.nest(res, function () {
-            return _this.translate.apply(_this, arguments);
-          }, options);
-        }
-
-        return res;
-      }
-    }, {
-      key: "resolve",
-      value: function resolve(keys) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (typeof keys === 'string') {
-          keys = [keys];
-        }
-
-        var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-        var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
-
-        var _iterator = _createForOfIteratorHelper(keys),
-            _step;
-
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var _key2 = _step.value;
-            var keyVariants = [_key2];
-            var pluralSuffix = needsPluralHandling && this.pluralResolver.getSuffix(this.options.lng, options.count);
-            var finalKey = _key2; // fallback for plural if context not found
-
-            if (needsPluralHandling && needsContextHandling) {
-              keyVariants.push(finalKey + pluralSuffix);
-            } // get key for context if needed
-
-
-            if (needsContextHandling) {
-              finalKey += "".concat(contextSeparator).concat(options.context);
-              keyVariants.push(finalKey);
-            } // get key for plural if needed
-
-
-            if (needsPluralHandling) {
-              keyVariants.push(finalKey + pluralSuffix);
-            }
-
-            var _iterator2 = _createForOfIteratorHelper(keyVariants.reverse()),
-                _step2;
-
-            try {
-              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-                var keyVariant = _step2.value;
-                var res = this.resources[keyVariant];
-
-                if (res !== undefined) {
-                  return {
-                    res: res,
-                    usedKey: _key2,
-                    exactUsedKey: keyVariant
-                  };
-                }
-              }
-            } catch (err) {
-              _iterator2.e(err);
-            } finally {
-              _iterator2.f();
-            }
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-      }
-    }]);
-
-    return Translator;
-  }();
-
-  function capitalize(string) {
+  var capitalize = function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
-  }
+  };
 
-  var LanguageUtil = /*#__PURE__*/function () {
-    function LanguageUtil(options) {
-      _classCallCheck(this, LanguageUtil);
+  var formatLanguageCode = function formatLanguageCode(code) {
+    // http://www.iana.org/assignments/language-tags/language-tags.xhtml
+    if (typeof code === 'string' && code.indexOf('-') > -1) {
+      var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
+      var p = code.split('-');
 
-      this.options = options;
+      if (p.length === 2) {
+        p[0] = p[0].toLowerCase();
+        p[1] = p[1].toUpperCase();
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+      } else if (p.length === 3) {
+        p[0] = p[0].toLowerCase(); // if lenght 2 guess it's a country
+
+        if (p[1].length === 2) p[1] = p[1].toUpperCase();
+        if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+        if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
+      }
+
+      return p.join('-');
     }
 
-    _createClass(LanguageUtil, [{
-      key: "getScriptPartFromCode",
-      value: function getScriptPartFromCode(code) {
-        if (!code || code.indexOf('-') < 0) return null;
-        var p = code.split('-');
-        if (p.length === 2) return null;
-        p.pop();
-        return this.formatLanguageCode(p.join('-'));
-      }
-    }, {
-      key: "getLanguagePartFromCode",
-      value: function getLanguagePartFromCode(code) {
-        if (!code || code.indexOf('-') < 0) return code;
-        var p = code.split('-');
-        return this.formatLanguageCode(p[0]);
-      }
-    }, {
-      key: "formatLanguageCode",
-      value: function formatLanguageCode(code) {
-        // http://www.iana.org/assignments/language-tags/language-tags.xhtml
-        if (typeof code === 'string' && code.indexOf('-') > -1) {
-          var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
-          var p = code.split('-');
+    return code;
+  };
 
-          if (this.options.lowerCaseLng) {
-            p = p.map(function (part) {
-              return part.toLowerCase();
-            });
-          } else if (p.length === 2) {
-            p[0] = p[0].toLowerCase();
-            p[1] = p[1].toUpperCase();
-            if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
-          } else if (p.length === 3) {
-            p[0] = p[0].toLowerCase(); // if lenght 2 guess it's a country
-
-            if (p[1].length === 2) p[1] = p[1].toUpperCase();
-            if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
-            if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
-            if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
-          }
-
-          return p.join('-');
-        }
-
-        return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
-      }
-    }]);
-
-    return LanguageUtil;
-  }();
+  var languageUtils = {
+    getScriptPartFromCode: function getScriptPartFromCode(code) {
+      if (!code || code.indexOf('-') < 0) return null;
+      var p = code.split('-');
+      if (p.length === 2) return null;
+      p.pop();
+      return formatLanguageCode(p.join('-'));
+    },
+    getLanguagePartFromCode: function getLanguagePartFromCode(code) {
+      if (!code || code.indexOf('-') < 0) return code;
+      var p = code.split('-');
+      return formatLanguageCode(p[0]);
+    }
+  };
 
   // definition http://translate.sourceforge.net/wiki/l10n/pluralforms
   var sets = [{
@@ -584,7 +385,6 @@
       return Number(n === 1 ? 0 : n === 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3);
     }
   };
-
   var rules = sets.reduce(function (acc, set) {
     Object.assign(acc, set.lngs.reduce(function (acc, l) {
       acc[l] = {
@@ -595,72 +395,55 @@
     }, {}));
     return acc;
   }, {});
+
   var separator = '_';
+  var logger = baseLogger.create('pluralResolver');
 
-  var PluralResolver = /*#__PURE__*/function () {
-    function PluralResolver(languageUtils) {
-      _classCallCheck(this, PluralResolver);
+  var getRule = function getRule(code) {
+    return rules[code] || rules[languageUtils.getLanguagePartFromCode(code)];
+  };
 
-      this.languageUtils = languageUtils;
-      this.logger = baseLogger.create('pluralResolver');
+  var getSuffix = function getSuffix(code, count) {
+    var rule = getRule(code);
+
+    if (!rule) {
+      logger.warn("no plural rule found for: ".concat(code));
+      return '';
     }
 
-    _createClass(PluralResolver, [{
-      key: "getRule",
-      value: function getRule(code) {
-        return rules[code] || rules[this.languageUtils.getLanguagePartFromCode(code)];
+    var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count)); // special treatment for lngs only having singular and plural
+
+    if (rule.numbers.length === 2 && rule.numbers[0] === 1) {
+      var suffix = rule.numbers[idx];
+
+      if (suffix === 2) {
+        suffix = 'plural';
+      } else if (suffix === 1) {
+        suffix = '';
       }
-    }, {
-      key: "needsPlural",
-      value: function needsPlural(code) {
-        var rule = this.getRule(code);
-        return rule && rule.numbers.length > 1;
-      }
-    }, {
-      key: "getPluralFormsOfKey",
-      value: function getPluralFormsOfKey(code, key) {
-        var _this = this;
 
-        var rule = this.getRule(code);
-        if (!rule) return [];
-        return rule.numbers.map(function (n) {
-          var suffix = _this.getSuffix(code, n);
+      var suffixStr = suffix.toString();
+      return suffixStr && separator + suffixStr;
+    }
 
-          return "".concat(key).concat(suffix);
-        });
-      }
-    }, {
-      key: "getSuffix",
-      value: function getSuffix(code, count) {
-        var rule = this.getRule(code);
+    var idxStr = idx.toString();
+    return idxStr && separator + idxStr;
+  };
 
-        if (!rule) {
-          this.logger.warn("no plural rule found for: ".concat(code));
-          return '';
-        } // if (rule.numbers.length === 1) return ''; // only singular
-
-
-        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
-        var suffix = rule.numbers[idx]; // special treatment for lngs only having singular and plural
-
-        if (rule.numbers.length === 2 && rule.numbers[0] === 1) {
-          if (suffix === 2) {
-            suffix = 'plural';
-          } else if (suffix === 1) {
-            suffix = '';
-          }
-
-          var suffixReturn = suffix.toString();
-          return suffixReturn && separator + suffixReturn;
-        }
-
-        var idxReturn = idx.toString();
-        return idxReturn && separator + idxReturn;
-      }
-    }]);
-
-    return PluralResolver;
-  }();
+  var pluralResolver = {
+    needsPlural: function needsPlural(code) {
+      var rule = getRule(code);
+      return rule && rule.numbers.length > 1;
+    },
+    getPluralFormsOfKey: function getPluralFormsOfKey(code, key) {
+      var rule = getRule(code);
+      if (!rule) return [];
+      return rule.numbers.map(function (n) {
+        var suffix = getSuffix(code, n);
+        return "".concat(key).concat(suffix);
+      });
+    }
+  };
 
   function _arrayWithHoles(arr) {
     if (Array.isArray(arr)) return arr;
@@ -674,28 +457,24 @@
     return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
   }
 
-  function makeString(object) {
-    if (object == null) return '';
-    /* eslint prefer-template: 0 */
+  var makeString = function makeString(object) {
+    return object == null ? '' : "".concat(object);
+  };
 
-    return '' + object;
-  }
+  var cleanKey = function cleanKey(key) {
+    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  };
 
-  function getLastOfPath(object, path, Empty) {
-    function cleanKey(key) {
-      return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
-    }
-
-    function canNotTraverseDeeper() {
+  var getLastOfPath = function getLastOfPath(object, path) {
+    var canNotTraverseDeeper = function canNotTraverseDeeper() {
       return !object || typeof object === 'string';
-    }
+    };
 
     var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
 
     while (stack.length > 1) {
       if (canNotTraverseDeeper()) return {};
       var key = cleanKey(stack.shift());
-      if (!object[key] && Empty) object[key] = new Empty();
       object = object[key];
     }
 
@@ -704,22 +483,23 @@
       obj: object,
       k: cleanKey(stack.shift())
     };
-  }
-  function getPath(object, path) {
-    var _getLastOfPath3 = getLastOfPath(object, path),
-        obj = _getLastOfPath3.obj,
-        k = _getLastOfPath3.k;
+  };
+
+  var getPath = function getPath(object, path) {
+    var _getLastOfPath = getLastOfPath(object, path),
+        obj = _getLastOfPath.obj,
+        k = _getLastOfPath.k;
 
     if (!obj) return undefined;
     return obj[k];
-  }
-  function regexEscape(str) {
-    /* eslint no-useless-escape: 0 */
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-  }
-  /* eslint-disable */
-
-  var _entityMap = {
+  };
+  var regexEscape = function regexEscape(str) {
+    return (
+      /* eslint no-useless-escape: 0 */
+      str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
+    );
+  };
+  var entityMap = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -727,17 +507,11 @@
     "'": '&#39;',
     '/': '&#x2F;'
   };
-  /* eslint-enable */
-
-  function escape(data) {
-    if (typeof data === 'string') {
-      return data.replace(/[&<>"'\/]/g, function (s) {
-        return _entityMap[s];
-      });
-    }
-
-    return data;
-  }
+  var escape = function escape(data) {
+    return typeof data === 'string' ? data.replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+    }) : data;
+  };
 
   function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -751,6 +525,10 @@
   var nestingSuffix = regexEscape(')');
   var nestingOptionsSeparator = ',';
 
+  var regexSafe = function regexSafe(val) {
+    return val.replace(/\$/g, '$$$$');
+  };
+
   var Interpolator = /*#__PURE__*/function () {
     function Interpolator() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -758,24 +536,17 @@
       _classCallCheck(this, Interpolator);
 
       this.logger = baseLogger.create('interpolator');
-      this.options = options;
 
       this.format = options.interpolationFormat || function (value) {
         return value;
       };
 
       this.maxReplaces = options.maxReplaces || 1000;
-      this.resetRegExp();
     }
 
     _createClass(Interpolator, [{
-      key: "reset",
-      value: function reset() {
-        this.resetRegExp();
-      }
-    }, {
-      key: "resetRegExp",
-      value: function resetRegExp() {
+      key: "_resetRegExp",
+      value: function _resetRegExp() {
         // the regexp
         this.regexp = new RegExp("".concat(prefix, "(.+?)").concat(suffix), 'g');
         this.regexpUnescape = new RegExp("".concat(prefix).concat(unescapePrefix, "(.+?)").concat(unescapeSuffix).concat(suffix), 'g');
@@ -785,14 +556,6 @@
       key: "interpolate",
       value: function interpolate(str, data, lng, options) {
         var _this = this;
-
-        var match;
-        var value;
-        var replaces;
-
-        function regexSafe(val) {
-          return val.replace(/\$/g, '$$$$');
-        }
 
         var handleFormat = function handleFormat(key) {
           if (key.indexOf(formatSeparator) < 0) {
@@ -805,13 +568,16 @@
           return _this.format(getPath(data, k), f, lng, options);
         };
 
-        this.resetRegExp();
-        replaces = 0; // unescape if has unescapePrefix/Suffix
+        this._resetRegExp();
+
+        var match;
+        var replaces;
+        replaces = 0; // unescape
 
         /* eslint no-cond-assign: 0 */
 
         while (match = this.regexpUnescape.exec(str)) {
-          value = handleFormat(match[1].trim());
+          var value = handleFormat(match[1].trim());
 
           if (value === undefined) {
             this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
@@ -832,17 +598,17 @@
         replaces = 0; // regular escape on demand
 
         while (match = this.regexp.exec(str)) {
-          value = handleFormat(match[1].trim());
+          var _value = handleFormat(match[1].trim());
 
-          if (value === undefined) {
+          if (_value === undefined) {
             this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-            value = '';
-          } else if (typeof value !== 'string') {
-            value = makeString(value);
+            _value = '';
+          } else if (typeof _value !== 'string') {
+            _value = makeString(_value);
           }
 
-          value = regexSafe(escape(value));
-          str = str.replace(match[0], value);
+          _value = regexSafe(escape(_value));
+          str = str.replace(match[0], _value);
           this.regexp.lastIndex = 0;
           replaces++;
 
@@ -855,10 +621,10 @@
       }
     }, {
       key: "nest",
-      value: function nest(str, fc) {
+      value: function nest(str, t, lng) {
         var _this2 = this;
 
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
         var match;
         var value;
 
@@ -867,27 +633,28 @@
         delete clonedOptions.defaultValue; // assert we do not get a endless loop on interpolating defaultValue again and again
         // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
 
-        function handleHasOptions(key, inheritedOptions) {
+        var handleHasOptions = function handleHasOptions(key, inheritedOptions) {
           var sep = nestingOptionsSeparator;
           if (key.indexOf(sep) < 0) return key;
           var c = key.split(new RegExp("".concat(sep, "[ ]*{")));
           var optionsString = "{".concat(c[1]);
           key = c[0];
-          optionsString = this.interpolate(optionsString, clonedOptions);
+          optionsString = _this2.interpolate(optionsString, clonedOptions);
           optionsString = optionsString.replace(/'/g, '"');
 
           try {
             clonedOptions = JSON.parse(optionsString);
             if (inheritedOptions) clonedOptions = _objectSpread$1(_objectSpread$1({}, inheritedOptions), clonedOptions);
           } catch (e) {
-            this.logger.warn("failed parsing options string in nesting for key ".concat(key), e);
+            _this2.logger.warn("failed parsing options string in nesting for key ".concat(key), e);
+
             return "".concat(key).concat(sep).concat(optionsString);
           } // assert we do not get a endless loop on interpolating defaultValue again and again
 
 
           delete clonedOptions.defaultValue;
           return key;
-        } // regular escape on demand
+        }; // regular escape on demand
 
 
         while (match = this.nestingRegexp.exec(str)) {
@@ -916,7 +683,7 @@
             doReduce = true;
           }
 
-          value = fc(handleHasOptions.call(this, match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
+          value = t(handleHasOptions(match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
 
           if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
 
@@ -929,7 +696,7 @@
 
           if (doReduce) {
             value = formatters.reduce(function (v, f) {
-              return _this2.format(v, f, options.lng, options);
+              return _this2.format(v, f, lng, options);
             }, value.trim());
           } // Nested keys should not be escaped by default #854
           // value = regexSafe(utils.escape(value));
@@ -946,13 +713,176 @@
     return Interpolator;
   }();
 
+  function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray$1(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+  function _unsupportedIterableToArray$1(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$1(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen); }
+
+  function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  var contextSeparator = '_';
+
+  var Translator = /*#__PURE__*/function () {
+    function Translator() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, Translator);
+
+      this.interpolator = new Interpolator(options);
+      this.options = options;
+      this.logger = baseLogger.create('translator');
+    }
+
+    _createClass(Translator, [{
+      key: "exists",
+      value: function exists(key, options) {
+        var resolved = this.resolve(key, options);
+        return resolved && resolved.res !== undefined;
+      }
+    }, {
+      key: "translate",
+      value: function translate(keys) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (typeof options === 'string') {
+          options = {
+            defaultValue: options
+          };
+        } // non valid keys handling
+
+
+        if (keys == null) return '';
+        if (!Array.isArray(keys)) keys = [String(keys)]; // resolve from store
+
+        var resolved = this.resolve(keys, options);
+        var res = resolved && resolved.res;
+        var resType = Object.prototype.toString.apply(res);
+        var noObject = ['[object Number]', '[object Function]', '[object RegExp]']; // object
+
+        var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
+        var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
+
+        if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0) {
+          this.logger.warn('accessing an object');
+          return "key '".concat(key, " (").concat(this.options.lng, ")' returned an object instead of string.");
+        } else {
+          // string, empty or null
+          var usedDefault = false;
+          var usedKey = false; // fallback value
+
+          if (res === undefined && options.defaultValue !== undefined) {
+            usedDefault = true;
+
+            if (options.count !== undefined) {
+              var suffix = pluralResolver.getSuffix(this.options.lng, options.count);
+              res = options["defaultValue".concat(suffix)];
+            }
+
+            if (!res) res = options.defaultValue;
+          }
+
+          if (res === undefined) {
+            usedKey = true;
+            res = key;
+          }
+
+          if (usedKey || usedDefault) {
+            this.logger.log('missingKey', this.options.lng, key, res);
+          } // extend
+
+
+          res = this.extendTranslation(res, options);
+        } // return
+
+
+        return res;
+      }
+    }, {
+      key: "extendTranslation",
+      value: function extendTranslation(res, options) {
+        var _this = this;
+
+        var newRes = this.interpolator.interpolate(res, options, this.options.lng, options);
+        return this.interpolator.nest(newRes, function () {
+          return _this.translate.apply(_this, arguments);
+        }, this.options.lng, options);
+      }
+    }, {
+      key: "resolve",
+      value: function resolve(keys) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (typeof keys === 'string') {
+          keys = [keys];
+        }
+
+        var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+        var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+
+        var _iterator = _createForOfIteratorHelper(keys),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var _key = _step.value;
+            var keyVariants = [_key];
+            var pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(this.options.lng, options.count);
+            var finalKey = _key; // fallback for plural if context not found
+
+            if (needsPluralHandling && needsContextHandling) {
+              keyVariants.push(finalKey + pluralSuffix);
+            } // get key for context if needed
+
+
+            if (needsContextHandling) {
+              finalKey += "".concat(contextSeparator).concat(options.context);
+              keyVariants.push(finalKey);
+            } // get key for plural if needed
+
+
+            if (needsPluralHandling) {
+              keyVariants.push(finalKey + pluralSuffix);
+            }
+
+            var _iterator2 = _createForOfIteratorHelper(keyVariants.reverse()),
+                _step2;
+
+            try {
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                var keyVariant = _step2.value;
+                var res = this.resources[keyVariant];
+
+                if (res !== undefined) {
+                  return {
+                    res: res,
+                    usedKey: _key,
+                    exactUsedKey: keyVariant
+                  };
+                }
+              }
+            } catch (err) {
+              _iterator2.e(err);
+            } finally {
+              _iterator2.f();
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
+    }]);
+
+    return Translator;
+  }();
+
   var defaults = {
     debug: false,
     resources: {},
     maxReplaces: 1000,
     interpolationFormat: function interpolationFormat(value, format, lng, options) {
       return value;
-    }
+    },
+    logger: null
   };
 
   function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -967,29 +897,17 @@
       _classCallCheck(this, I18n);
 
       this.options = _objectSpread$2(_objectSpread$2({}, defaults), options);
-      this.services = {};
       this.logger = baseLogger;
-      this.init();
+
+      if (!this.options.lng) {
+        this.logger.warn('init: no lng is defined');
+      }
+
+      baseLogger.init(this.options.logger, this.options);
+      this.translator = new Translator(this.options);
     }
 
     _createClass(I18n, [{
-      key: "init",
-      value: function init() {
-        if (!this.options.lng) {
-          this.logger.warn('init: no lng is defined');
-        } // init services
-
-
-        baseLogger.init(null, this.options);
-        this.languageUtils = new LanguageUtil(this.options);
-        var pluralResolver = new PluralResolver(this.languageUtils);
-        var interpolator = new Interpolator(this.options);
-        this.translator = new Translator({
-          pluralResolver: pluralResolver,
-          interpolator: interpolator
-        }, this.options);
-      }
-    }, {
       key: "t",
       value: function t() {
         var _this$translator;
@@ -1007,7 +925,7 @@
       key: "dir",
       value: function dir(lng) {
         if (!lng) return 'rtl';
-        return rtlLngs.indexOf(this.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
+        return rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
       }
     }]);
 

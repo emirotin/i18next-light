@@ -1,7 +1,5 @@
 import Translator from '../../src/Translator';
 import ResourceStore from '../../src/ResourceStore.js';
-import LanguageUtils from '../../src/LanguageUtils';
-import PluralResolver from '../../src/PluralResolver';
 import Interpolator from '../../src/Interpolator';
 
 describe('Translator', () => {
@@ -25,12 +23,8 @@ describe('Translator', () => {
           },
         },
       });
-      const lu = new LanguageUtils({ fallbackLng: 'en' });
       t = new Translator(
         {
-          resourceStore: rs,
-          languageUtils: lu,
-          pluralResolver: new PluralResolver(lu),
           interpolator: new Interpolator(),
         },
         {
