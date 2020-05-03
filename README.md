@@ -21,7 +21,21 @@ No whitelist
 returnNull && returnEmptyString always true, returnObjects, joinArrays — always false
 returnedObjectHandler unused
 
+No missingInterpolationHandler, missingKeyHandler, parseMissingKeyHandler
+
+overloadTranslationOptionHandler unused, options must be an object (if passed at all), or a string (defaultValue)
+
 Only format v3 is supported
+
+escapeValue unused, use `{{- var }}` for unescaped translations
+
+defaultVariables unused, handle your vars in the userland
+
+options.interpolation.maxReplaces => options.maxReplaces (and not overridable by the `t` options)
+
+options.interpolation.format => options.interpolationFormat (and not overridable by the `t` options)
+
+useRawValueToEscape unused
 
 # i18next: learn once - translate everywhere [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Awesome%20i18next:%20learn%20once%20-%20translate%20everywhere%20-%20the%20internationalization%20ecosystem%20&url=https://github.com/i18next/i18next&via=jamuhl&hashtags=i18n,javascript,dev)
 

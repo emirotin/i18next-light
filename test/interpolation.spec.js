@@ -5,7 +5,7 @@ describe('Interpolator', () => {
     var ip;
 
     before(() => {
-      ip = new Interpolator({ interpolation: { escapeValue: false } });
+      ip = new Interpolator({});
     });
 
     var tests = [
@@ -29,57 +29,15 @@ describe('Interpolator', () => {
     });
   });
 
-  describe('interpolate() - defaultVariables', () => {
-    var ip;
-
-    before(() => {
-      ip = new Interpolator({
-        interpolation: {
-          escapeValue: false,
-          defaultVariables: { test: '123', bit: { more: '456' } },
-        },
-      });
-    });
-
-    var tests = [
-      { args: ['test'], expected: 'test' },
-      { args: ['test {{test}}'], expected: 'test 123' },
-      {
-        args: ['test {{test}} a {{bit.more}}'],
-        expected: 'test 123 a 456',
-      },
-      // prio has passed in variables
-      { args: ['test {{ test }}', { test: '124' }], expected: 'test 124' },
-      { args: ['test {{ test }}', { test: null }], expected: 'test ' },
-
-      // Override default variable only with null, not with undefined.
-      { args: ['test {{ test }}', { test: undefined }], expected: 'test 123' },
-    ];
-
-    tests.forEach(test => {
-      it('correctly interpolates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
-      });
-    });
-  });
-
   describe('interpolate() - options', () => {
     var tests = [
       {
-        options: { interpolation: {} },
-        expected: {
-          escapeValue: true,
-        },
-      },
-      {
         options: {},
-        expected: {
-          escapeValue: true,
-        },
+        expected: {},
       },
       {
         description: 'uses maxReplaces if provided',
-        options: { interpolation: { maxReplaces: 100 } },
+        options: { maxReplaces: 100 },
         expected: { maxReplaces: 100 },
       },
     ];
@@ -107,7 +65,6 @@ describe('Interpolator', () => {
     before(() => {
       ip = new Interpolator({
         interpolation: {
-          escapeValue: false,
           format: function(value, format, lng) {
             if (format === 'uppercase') return value.toUpperCase();
             if (format === 'lowercase') return value.toLowerCase();
@@ -146,7 +103,6 @@ describe('Interpolator', () => {
     before(() => {
       ip = new Interpolator({
         interpolation: {
-          alwaysFormat: true,
           format: function(value, format, lng) {
             if (format === 'uppercase') return value.toUpperCase();
             return value.toLowerCase();
@@ -278,9 +234,7 @@ describe('Interpolator', () => {
 
     before(() => {
       ip = new Interpolator({
-        interpolation: {
-          maxReplaces: 10,
-        },
+        maxReplaces: 10,
       });
     });
 
@@ -300,72 +254,34 @@ describe('Interpolator', () => {
   });
 
   describe('interpolate() - with undefined interpolation value', () => {
-    var ip;
-    var tests = [{ args: ['{{test}}'], expected: '' }];
-
-    before(() => {
-      ip = new Interpolator({
-        missingInterpolationHandler: (str, match) => {
-          expect(str).to.eql('{{test}}');
-          expect(match[0]).to.eql('{{test}}');
-          expect(match[1]).to.eql('test');
-        },
-      });
-    });
-
-    tests.forEach(test => {
-      it(
-        'correctly calls missingInterpolationHandler for ' + JSON.stringify(test.args) + ' args',
-        () => {
-          expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
-        },
-      );
-    });
+    // var ip;
+    // var tests = [{ args: ['{{test}}'], expected: '' }];
+    // before(() => {
+    //   ip = new Interpolator({
+    //     missingInterpolationHandler: (str, match) => {
+    //       expect(str).to.eql('{{test}}');
+    //       expect(match[0]).to.eql('{{test}}');
+    //       expect(match[1]).to.eql('test');
+    //     },
+    //   });
+    // });
+    // tests.forEach(test => {
+    //   it(
+    //     'correctly calls missingInterpolationHandler for ' + JSON.stringify(test.args) + ' args',
+    //     () => {
+    //       expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
+    //     },
+    //   );
+    // });
+    // TODO: different test needed, use logger mocking?
   });
 
-  describe('interpolate() - with undefined interpolation value - filled by missingInterpolationHandler', () => {
-    var ip;
-    var tests = [{ args: ['{{test}}'], expected: 'test' }];
-
-    before(() => {
-      ip = new Interpolator({
-        missingInterpolationHandler: (str, match) => {
-          expect(str).to.eql('{{test}}');
-          expect(match[0]).to.eql('{{test}}');
-          expect(match[1]).to.eql('test');
-          return 'test';
-        },
-      });
-    });
-
-    tests.forEach(test => {
-      it(
-        'correctly calls missingInterpolationHandler for ' + JSON.stringify(test.args) + ' args',
-        () => {
-          expect(ip.interpolate.apply(ip, test.args)).to.eql(test.expected);
-        },
-      );
-    });
-
-    it('correctly calls handler provided via options', () => {
-      expect(
-        ip.interpolate('{{custom}}', {}, null, {
-          missingInterpolationHandler: (str, match) => 'overridden',
-        }),
-      ).to.eql('overridden');
-    });
-  });
-
-  describe('interpolate() - with null interpolation value - not filled by missingInterpolationHandler', () => {
+  describe('interpolate() - with null interpolation value', () => {
     var ip;
     var tests = [{ args: ['{{test}}', { test: null }], expected: '' }];
 
     before(() => {
-      ip = new Interpolator({
-        missingInterpolationHandler: (str, match) => {
-          return 'test';
-        },
-      });
+      ip = new Interpolator({});
     });
 
     tests.forEach(test => {

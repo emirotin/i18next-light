@@ -56,15 +56,6 @@ export function getPath(object, path) {
   return obj[k];
 }
 
-export function getPathWithDefaults(data, defaultData, key) {
-  const value = getPath(data, key);
-  if (value !== undefined) {
-    return value;
-  }
-  // Fallback to default values
-  return getPath(defaultData, key);
-}
-
 export function regexEscape(str) {
   /* eslint no-useless-escape: 0 */
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');

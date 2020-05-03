@@ -3,7 +3,7 @@ import Translator from './Translator.js';
 import LanguageUtils from './LanguageUtils.js';
 import PluralResolver from './PluralResolver.js';
 import Interpolator from './Interpolator.js';
-import { get as getDefaults } from './defaults.js';
+import defaults from './defaults.js';
 
 const rtlLngs = [
   'ar',
@@ -70,62 +70,26 @@ const rtlLngs = [
 
 class I18n {
   constructor(options = {}) {
-    super();
-
-    this.options = options;
+    this.options = { ...defaults, ...options };
     this.services = {};
     this.logger = baseLogger;
-    this.modules = { external: [] };
 
-    this.init(options, callback);
+    this.init();
   }
 
-  init(options = {}) {
-    this.options = { ...getDefaults(), ...this.options, ...options };
-
-    this.format = this.options.interpolation.format;
-
-    function createClassOnDemand(ClassOrObject) {
-      if (!ClassOrObject) return null;
-      if (typeof ClassOrObject === 'function') return new ClassOrObject();
-      return ClassOrObject;
+  init() {
+    if (!this.options.lng) {
+      this.logger.warn('init: no lng is defined');
     }
 
     // init services
-    if (!this.options.isClone) {
-      if (this.modules.logger) {
-        baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
-      } else {
-        baseLogger.init(null, this.options);
-      }
+    baseLogger.init(null, this.options);
 
-      const lu = new LanguageUtils(this.options);
+    this.languageUtils = new LanguageUtils(this.options);
 
-      const s = this.services;
-      s.logger = baseLogger;
-      s.languageUtils = lu;
-      s.pluralResolver = new PluralResolver(lu, {
-        prepend: this.options.pluralSeparator,
-        compatibilityJSON: this.options.compatibilityJSON,
-        simplifyPluralSuffix: this.options.simplifyPluralSuffix,
-      });
-      s.interpolator = new Interpolator(this.options);
-
-      if (this.modules.languageDetector) {
-        s.languageDetector = createClassOnDemand(this.modules.languageDetector);
-        s.languageDetector.init(s, this.options.detection, this.options);
-      }
-
-      this.translator = new Translator(this.services, this.options);
-
-      this.modules.external.forEach(m => {
-        if (m.init) m.init(this);
-      });
-    }
-
-    if (!this.modules.languageDetector && !this.options.lng) {
-      this.logger.warn('init: no languageDetector is used and no lng is defined');
-    }
+    const pluralResolver = new PluralResolver(this.languageUtils);
+    const interpolator = new Interpolator(this.options);
+    this.translator = new Translator({ pluralResolver, interpolator }, this.options);
   }
 
   t(...args) {
@@ -139,9 +103,7 @@ class I18n {
   dir(lng) {
     if (!lng) return 'rtl';
 
-    return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0
-      ? 'rtl'
-      : 'ltr';
+    return rtlLngs.indexOf(this.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
   }
 }
 
