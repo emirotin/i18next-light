@@ -18,6 +18,9 @@ No special CI mode handling.
 
 No whitelist
 
+returnNull && returnEmptyString always true, returnObjects, joinArrays — always false
+returnedObjectHandler unused
+
 Only format v3 is supported
 
 # i18next: learn once - translate everywhere [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Awesome%20i18next:%20learn%20once%20-%20translate%20everywhere%20-%20the%20internationalization%20ecosystem%20&url=https://github.com/i18next/i18next&via=jamuhl&hashtags=i18n,javascript,dev)
