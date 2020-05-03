@@ -119,7 +119,7 @@ class Translator {
       }
 
       for (const keyVariant of keyVariants.reverse()) {
-        const res = this.resources[keyVariant];
+        const res = this.options.resources[keyVariant];
 
         if (res !== undefined) {
           return { res, usedKey: key, exactUsedKey: keyVariant };
