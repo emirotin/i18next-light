@@ -6,8 +6,6 @@ export function get() {
     missingKeyHandler: false, // function(lng, ns, key, fallbackValue) -> override if prefer on handling
     missingInterpolationHandler: false, // function(str, match)
 
-    returnNull: true, // allows null value as valid translation
-    returnEmptyString: true, // allows empty string value as valid translation
     returnObjects: false,
     joinArrays: false, // or string to join array
     returnedObjectHandler: false, // function(key, value, options) triggered if key returns object but returnObjects is set to false

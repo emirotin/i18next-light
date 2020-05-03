@@ -73,7 +73,7 @@ class Translator {
       let usedKey = false;
 
       // fallback value
-      if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
+      if (res === undefined && options.defaultValue !== undefined) {
         usedDefault = true;
 
         if (options.count !== undefined) {
@@ -82,7 +82,7 @@ class Translator {
         }
         if (!res) res = options.defaultValue;
       }
-      if (!this.isValidLookup(res)) {
+      if (res === undefined) {
         usedKey = true;
         res = key;
       }
@@ -158,19 +158,11 @@ class Translator {
       for (const keyVariant of keyVariants.reverse()) {
         const res = this.resources[keyVariant];
 
-        if (this.isValidLookup(res)) {
+        if (res !== undefined) {
           return { res, usedKey: key, exactUsedKey: keyVariant };
         }
       }
     }
-  }
-
-  isValidLookup(res) {
-    return (
-      res !== undefined &&
-      !(!this.options.returnNull && res === null) &&
-      !(!this.options.returnEmptyString && res === '')
-    );
   }
 }
 
