@@ -1,11 +1,9 @@
 import baseLogger from './logger.js';
 import pluralResolver from './PluralResolver.js';
-import Interpolator from './Interpolator.js';
 
 const contextSeparator = '_';
 
-const Translator = (options = {}) => {
-  const interpolator = new Interpolator(options);
+const Translator = (interpolator, options = {}) => {
   const logger = baseLogger.create('translator');
   const topOptions = options;
 

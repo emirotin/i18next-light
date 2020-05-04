@@ -83,9 +83,12 @@ const I18n = (options = {}) => {
     logger.warn('init: no lng is defined');
   }
 
-  const translator = new Translator(options);
+  const interpolator = Interpolator(options);
+  const translator = Translator(interpolator, options);
 
   return {
+    interpolator,
+    translator,
     t: (...args) => translator.translate(...args),
     exists: (...args) => translator.exists(...args),
     dir: lng =>

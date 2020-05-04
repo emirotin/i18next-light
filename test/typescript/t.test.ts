@@ -1,5 +1,7 @@
 import i18next, { TFunction } from 'i18next';
 
+const i18n = i18next();
+
 function basicUsage(t: TFunction) {
   t('friend');
   t`friend`;
@@ -9,16 +11,13 @@ function basicUsage(t: TFunction) {
 }
 
 function overloadedUsage(t: TFunction) {
-  t('friend', 'test {{myVar}}', { myVar: 'someValue' });
-  t(['friend', 'tree'], 'test {{myVar}}', { myVar: 'someValue' });
+  t('friend', 'test {{myVar}}');
+  t(['friend', 'tree'], 'test {{myVar}}');
 }
 
 function returnCasts(t: TFunction) {
   const s: string = t('friend'); // same as <string>
   const s2: string = t`friend`;
-  const o: object = t<object>('friend');
-  const sa: string[] = t<string[]>('friend');
-  const oa: object[] = t<object[]>('friend');
 }
 
 function defautValue(t: TFunction) {
@@ -82,7 +81,7 @@ function stringKey(t: TFunction) {
 
 function interpolation(t: TFunction) {
   // key = 'hello {{what}}'
-  t('key', { what: i18next.format('world', 'uppercase') }); // -> hello WORLD
+  t('key', { what: 'WORLD' }); // -> hello WORLD
 
   t('key', { what: 'i18next', how: 'great' });
 
