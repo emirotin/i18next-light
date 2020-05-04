@@ -9,7 +9,7 @@ const defaults = {
   resources: {},
   maxReplaces: 1000,
   interpolationFormat: (value, _format, _lng, _options) => value,
-  logger: null,
+  logger: undefined,
 };
 
 const rtlLngs = [
@@ -77,8 +77,9 @@ const rtlLngs = [
 
 const I18n = (options = {}) => {
   options = { ...defaults, ...options };
+  baseLogger.init(options.logger, { debug: options.debug });
+
   const logger = baseLogger;
-  baseLogger.init(options.logger, options);
 
   if (!options.lng) {
     logger.warn('init: no lng is defined');

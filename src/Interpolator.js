@@ -163,7 +163,7 @@ const Interpolator = (options = {}) => {
     return str;
   };
 
-  return { interpolate, nest };
+  return { maxReplaces, interpolate, nest };
 };
 
 export default Interpolator;

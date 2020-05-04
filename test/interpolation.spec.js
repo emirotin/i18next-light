@@ -20,7 +20,7 @@ describe('Interpolator', () => {
       { args: ['test {{ test }}', { test: null }], expected: 'test ' },
       { args: ['test {{ test }}', { test: undefined }], expected: 'test ' },
       { args: ['test {{ test }}', {}], expected: 'test ' },
-      { args: ['test {{test.deep}}', { 'test.deep': '123' }], expected: 'test 123' },
+      { args: ['test {{test.deep}}', { test: { deep: '123' } }], expected: 'test 123' },
     ];
 
     tests.forEach(test => {
@@ -203,27 +203,33 @@ describe('Interpolator', () => {
     let ip;
 
     before(() => {
-      ip = Interpolator();
-      logger.init({
-        log: (...args) => {
-          logs.push({
-            type: 'log',
-            args,
-          });
+      logger.init(
+        {
+          name: 'mockLogger',
+          log: (...args) => {
+            logs.push({
+              type: 'log',
+              args,
+            });
+          },
+          warn: (...args) => {
+            logs.push({
+              type: 'warn',
+              args,
+            });
+            return 'WARN';
+          },
+          error: (...args) => {
+            logs.push({
+              type: 'error',
+              args,
+            });
+          },
         },
-        warn: (...args) => {
-          logs.push({
-            type: 'warn',
-            args,
-          });
-        },
-        error: (...args) => {
-          logs.push({
-            type: 'error',
-            args,
-          });
-        },
-      });
+        { debug: true },
+      );
+
+      ip = Interpolator({});
     });
 
     beforeEach(() => {
@@ -231,7 +237,7 @@ describe('Interpolator', () => {
     });
 
     after(() => {
-      logger.init(undefined);
+      logger.init(undefined, { debug: false });
     });
 
     const tests = [
@@ -248,9 +254,10 @@ describe('Interpolator', () => {
         'correctly handles missing interpolation for ' + JSON.stringify(test.args) + ' args',
         () => {
           expect(ip.interpolate(...test.args)).to.eql(test.expected);
+
           expect(logs).to.contain({
             type: 'warn',
-            args: [test.warning],
+            args: ['i18next::interpolator: ' + test.warning],
           });
         },
       );
