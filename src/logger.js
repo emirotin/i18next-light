@@ -1,68 +1,55 @@
 const consoleLogger = {
-  type: 'logger',
-
-  log(args) {
-    this.output('log', args);
+  log: (...args) => {
+    console && console.log(...args);
   },
 
-  warn(args) {
-    this.output('warn', args);
+  warn: (...args) => {
+    console && console.warn(...args);
   },
 
-  error(args) {
-    this.output('error', args);
-  },
-
-  output(type, args) {
-    /* eslint no-console: 0 */
-    if (console && console[type]) console[type](...args);
+  error: (...args) => {
+    console && console.error(...args);
   },
 };
 
-class Logger {
-  constructor(concreteLogger, options = {}) {
-    this.init(concreteLogger, options);
-  }
+const Logger = (concreteLogger = consoleLogger, options = {}) => {
+  let logger, prefix, _options, debug;
 
-  init(concreteLogger, options = {}) {
-    this.prefix = options.prefix || 'i18next:';
-    this.logger = concreteLogger || consoleLogger;
-    this.options = options;
-    this.debug = options.debug;
-  }
+  init(concreteLogger, options);
 
-  setDebug(bool) {
-    this.debug = bool;
-  }
+  const init = (concreteLogger = consoleLogger, options = {}) => {
+    logger = concreteLogger;
+    prefix = options.prefix || 'i18next:';
+    _options = options;
+    debug = options.debug;
+  };
 
-  log(...args) {
-    return this.forward(args, 'log', '', true);
-  }
+  const setDebug = bool => {
+    debug = bool;
+  };
 
-  warn(...args) {
-    return this.forward(args, 'warn', '', true);
-  }
+  const forward = (args, lvl, extraPrefix, debugOnly) => {
+    if (debugOnly && !debug) return null;
+    args = [...args];
+    if (typeof args[0] === 'string') args[0] = `${extraPrefix}${prefix} ${args[0]}`;
+    return logger[lvl](...args);
+  };
 
-  error(...args) {
-    return this.forward(args, 'error', '');
-  }
+  const log = (...args) => forward(args, 'log', '', true);
 
-  deprecate(...args) {
-    return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
-  }
+  const warn = (...args) => forward(args, 'warn', '', true);
 
-  forward(args, lvl, prefix, debugOnly) {
-    if (debugOnly && !this.debug) return null;
-    if (typeof args[0] === 'string') args[0] = `${prefix}${this.prefix} ${args[0]}`;
-    return this.logger[lvl](args);
-  }
+  const error = (...args) => forward(args, 'error', '');
 
-  create(moduleName) {
-    return new Logger(this.logger, {
-      ...{ prefix: `${this.prefix}:${moduleName}:` },
-      ...this.options,
+  const deprecate = (...args) => forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+
+  const create = moduleName =>
+    Logger(logger, {
+      ...{ prefix: `${prefix}:${moduleName}:` },
+      ..._options,
     });
-  }
-}
 
-export default new Logger();
+  return { setDebug, log, warn, error, deprecate, create };
+};
+
+export default Logger();
