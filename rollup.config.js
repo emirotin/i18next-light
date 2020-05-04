@@ -10,25 +10,17 @@ const getBabelOptions = ({ useESModules }) => ({
 });
 
 const input = './src/index.js';
-const name = 'i18next';
+const name = 'i18next-light';
 // check relative and absolute paths for windows and unix
 const external = id => !id.startsWith('.') && !id.startsWith('/') && !id.includes(':');
 
 export default [
   {
     input,
-    output: { format: 'cjs', file: pkg.main },
+    output: { format: 'cjs', file: `dist/cjs/${name}.js` },
     external,
     plugins: [babel(getBabelOptions({ useESModules: false }))],
   },
-
-  {
-    input,
-    output: { format: 'esm', file: pkg.module },
-    external,
-    plugins: [babel(getBabelOptions({ useESModules: true }))],
-  },
-
   {
     input,
     output: { format: 'umd', name, file: `dist/umd/${name}.js` },

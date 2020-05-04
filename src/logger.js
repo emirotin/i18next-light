@@ -19,7 +19,7 @@ const Logger = (concreteLogger = consoleLogger, options = {}) => {
   const init = (concreteLogger, options) => {
     logger = concreteLogger || consoleLogger;
     _options = options || _options;
-    prefix = _options.prefix || 'i18next:';
+    prefix = _options.prefix || 'i18next-light:';
     debug = _options.debug;
   };
 
