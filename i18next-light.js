@@ -2,10 +2,10 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global['i18next-light'] = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   const consoleLogger = {
-    name: 'consoleLogger',
+    name: "consoleLogger",
     log: (...args) => {
       console && console.log(...args);
     },
@@ -23,7 +23,7 @@
     const init = (concreteLogger, options) => {
       logger = concreteLogger || consoleLogger;
       _options = options || _options;
-      prefix = _options.prefix || 'i18next-light:';
+      prefix = _options.prefix || "i18next-light:";
       debug = _options.debug;
     };
 
@@ -31,27 +31,27 @@
       debug = _debug;
     };
 
-    const forward = (args, lvl, extraPrefix = '', debugOnly) => {
+    const forward = (args, lvl, extraPrefix = "", debugOnly) => {
       if (debugOnly && !debug) {
         return;
       }
 
       args = [...args];
 
-      if (typeof args[0] === 'string') {
+      if (typeof args[0] === "string") {
         args[0] = `${extraPrefix}${prefix} ${args[0]}`;
       }
 
       return logger[lvl](...args);
     };
 
-    const log = (...args) => forward(args, 'log', '', true);
+    const log = (...args) => forward(args, "log", "", true);
 
-    const warn = (...args) => forward(args, 'warn', '', true);
+    const warn = (...args) => forward(args, "warn", "", true);
 
-    const error = (...args) => forward(args, 'error', '');
+    const error = (...args) => forward(args, "error", "");
 
-    const deprecate = (...args) => forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+    const deprecate = (...args) => forward(args, "warn", "WARNING DEPRECATED: ", true);
 
     const create = moduleName => Logger(logger, {
       prefix: `${prefix}:${moduleName}:`,
@@ -76,9 +76,9 @@
 
   const formatLanguageCode = code => {
     // http://www.iana.org/assignments/language-tags/language-tags.xhtml
-    if (typeof code === 'string' && code.indexOf('-') > -1) {
-      const specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
-      let p = code.split('-');
+    if (typeof code === "string" && code.indexOf("-") > -1) {
+      const specialCases = ["hans", "hant", "latn", "cyrl", "cans", "mong", "arab"];
+      let p = code.split("-");
 
       if (p.length === 2) {
         p[0] = p[0].toLowerCase();
@@ -88,12 +88,12 @@
         p[0] = p[0].toLowerCase(); // if lenght 2 guess it's a country
 
         if (p[1].length === 2) p[1] = p[1].toUpperCase();
-        if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
+        if (p[0] !== "sgn" && p[2].length === 2) p[2] = p[2].toUpperCase();
         if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
         if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
       }
 
-      return p.join('-');
+      return p.join("-");
     }
 
     return code;
@@ -101,110 +101,110 @@
 
   const languageUtils = {
     getScriptPartFromCode: code => {
-      if (!code || code.indexOf('-') < 0) return null;
-      const p = code.split('-');
+      if (!code || code.indexOf("-") < 0) return null;
+      const p = code.split("-");
       if (p.length === 2) return null;
       p.pop();
-      return formatLanguageCode(p.join('-'));
+      return formatLanguageCode(p.join("-"));
     },
     getLanguagePartFromCode: code => {
-      if (!code || code.indexOf('-') < 0) return code;
-      const p = code.split('-');
+      if (!code || code.indexOf("-") < 0) return code;
+      const p = code.split("-");
       return formatLanguageCode(p[0]);
     }
   };
 
   // definition http://translate.sourceforge.net/wiki/l10n/pluralforms
   const sets = [{
-    lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'],
+    lngs: ["ach", "ak", "am", "arn", "br", "fil", "gun", "ln", "mfe", "mg", "mi", "oc", "pt", "pt-BR", "tg", "ti", "tr", "uz", "wa"],
     nr: [1, 2],
     fc: 1
   }, {
-    lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'],
+    lngs: ["af", "an", "ast", "az", "bg", "bn", "ca", "da", "de", "dev", "el", "en", "eo", "es", "et", "eu", "fi", "fo", "fur", "fy", "gl", "gu", "ha", "hi", "hu", "hy", "ia", "it", "kn", "ku", "lb", "mai", "ml", "mn", "mr", "nah", "nap", "nb", "ne", "nl", "nn", "no", "nso", "pa", "pap", "pms", "ps", "pt-PT", "rm", "sco", "se", "si", "so", "son", "sq", "sv", "sw", "ta", "te", "tk", "ur", "yo"],
     nr: [1, 2],
     fc: 2
   }, {
-    lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
+    lngs: ["ay", "bo", "cgg", "fa", "id", "ja", "jbo", "ka", "kk", "km", "ko", "ky", "lo", "ms", "sah", "su", "th", "tt", "ug", "vi", "wo", "zh"],
     nr: [1],
     fc: 3
   }, {
-    lngs: ['be', 'bs', 'cnr', 'dz', 'hr', 'ru', 'sr', 'uk'],
+    lngs: ["be", "bs", "cnr", "dz", "hr", "ru", "sr", "uk"],
     nr: [1, 2, 5],
     fc: 4
   }, {
-    lngs: ['ar'],
+    lngs: ["ar"],
     nr: [0, 1, 2, 3, 11, 100],
     fc: 5
   }, {
-    lngs: ['cs', 'sk'],
+    lngs: ["cs", "sk"],
     nr: [1, 2, 5],
     fc: 6
   }, {
-    lngs: ['csb', 'pl'],
+    lngs: ["csb", "pl"],
     nr: [1, 2, 5],
     fc: 7
   }, {
-    lngs: ['cy'],
+    lngs: ["cy"],
     nr: [1, 2, 3, 8],
     fc: 8
   }, {
-    lngs: ['fr'],
+    lngs: ["fr"],
     nr: [1, 2],
     fc: 9
   }, {
-    lngs: ['ga'],
+    lngs: ["ga"],
     nr: [1, 2, 3, 7, 11],
     fc: 10
   }, {
-    lngs: ['gd'],
+    lngs: ["gd"],
     nr: [1, 2, 3, 20],
     fc: 11
   }, {
-    lngs: ['is'],
+    lngs: ["is"],
     nr: [1, 2],
     fc: 12
   }, {
-    lngs: ['jv'],
+    lngs: ["jv"],
     nr: [0, 1],
     fc: 13
   }, {
-    lngs: ['kw'],
+    lngs: ["kw"],
     nr: [1, 2, 3, 4],
     fc: 14
   }, {
-    lngs: ['lt'],
+    lngs: ["lt"],
     nr: [1, 2, 10],
     fc: 15
   }, {
-    lngs: ['lv'],
+    lngs: ["lv"],
     nr: [1, 2, 0],
     fc: 16
   }, {
-    lngs: ['mk'],
+    lngs: ["mk"],
     nr: [1, 2],
     fc: 17
   }, {
-    lngs: ['mnk'],
+    lngs: ["mnk"],
     nr: [0, 1, 2],
     fc: 18
   }, {
-    lngs: ['mt'],
+    lngs: ["mt"],
     nr: [1, 2, 11, 20],
     fc: 19
   }, {
-    lngs: ['or'],
+    lngs: ["or"],
     nr: [2, 1],
     fc: 2
   }, {
-    lngs: ['ro'],
+    lngs: ["ro"],
     nr: [1, 2, 20],
     fc: 20
   }, {
-    lngs: ['sl'],
+    lngs: ["sl"],
     nr: [5, 1, 2, 3],
     fc: 21
   }, {
-    lngs: ['he'],
+    lngs: ["he"],
     nr: [1, 2, 20, 21],
     fc: 22
   }];
@@ -243,8 +243,8 @@
     return acc;
   }, {});
 
-  const separator = '_';
-  const logger = baseLogger.create('pluralResolver');
+  const separator = "_";
+  const logger = baseLogger.create("pluralResolver");
 
   const getRule = code => rules[code] || rules[languageUtils.getLanguagePartFromCode(code)];
 
@@ -253,7 +253,7 @@
 
     if (!rule) {
       logger.warn(`no plural rule found for: ${code}`);
-      return '';
+      return "";
     }
 
     const idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count)); // special treatment for lngs only having singular and plural
@@ -262,9 +262,9 @@
       let suffix = rule.numbers[idx];
 
       if (suffix === 2) {
-        suffix = 'plural';
+        suffix = "plural";
       } else if (suffix === 1) {
-        suffix = '';
+        suffix = "";
       }
 
       const suffixStr = suffix.toString();
@@ -291,42 +291,27 @@
     }
   };
 
-  const contextSeparator = '_';
+  const contextSeparator = "_";
 
   const Translator = (interpolator, options = {}) => {
-    const logger = baseLogger.create('translator');
+    const logger = baseLogger.create("translator");
     const topOptions = options;
     const resources = options.resources || {};
 
     const resolve = (keys, options = {}) => {
-      if (typeof keys === 'string') {
+      if (typeof keys === "string") {
         keys = [keys];
       }
 
-      const needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-      const needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+      const needsPluralHandling = options.count !== undefined && typeof options.count !== "string";
+      const needsContextHandling = options.context !== undefined && typeof options.context === "string" && options.context !== "";
+      const pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(topOptions.lng, options.count);
+      const contextSuffix = needsContextHandling && `${contextSeparator}${options.context}`;
 
       for (const key of keys) {
-        const keyVariants = [key];
-        const pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(topOptions.lng, options.count);
-        let finalKey = key; // fallback for plural if context not found
+        const keyVariants = [needsPluralHandling && needsContextHandling && `${key}${contextSuffix}${pluralSuffix}`, needsContextHandling && `${key}${contextSuffix}`, needsPluralHandling && `${key}${pluralSuffix}`, key].filter(Boolean);
 
-        if (needsPluralHandling && needsContextHandling) {
-          keyVariants.push(finalKey + pluralSuffix);
-        } // get key for context if needed
-
-
-        if (needsContextHandling) {
-          finalKey += `${contextSeparator}${options.context}`;
-          keyVariants.push(finalKey);
-        } // get key for plural if needed
-
-
-        if (needsPluralHandling) {
-          keyVariants.push(finalKey + pluralSuffix);
-        }
-
-        for (const keyVariant of keyVariants.reverse()) {
+        for (const keyVariant of keyVariants) {
           const res = resources[keyVariant];
 
           if (res !== undefined) {
@@ -346,25 +331,25 @@
     };
 
     const translate = (keys, options = {}) => {
-      if (typeof options === 'string') {
+      if (typeof options === "string") {
         options = {
           defaultValue: options
         };
       } // non valid keys handling
 
 
-      if (keys == null) return '';
+      if (keys == null) return "";
       if (!Array.isArray(keys)) keys = [String(keys)]; // resolve from store
 
       const resolved = resolve(keys, options);
       let res = resolved && resolved.res;
       const resType = Object.prototype.toString.apply(res);
-      const noObject = ['[object Number]', '[object Function]', '[object RegExp]']; // object
+      const noObject = ["[object Number]", "[object Function]", "[object RegExp]"]; // object
 
-      const handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
+      const handleAsObject = typeof res !== "string" && typeof res !== "boolean" && typeof res !== "number";
 
       if (res && handleAsObject && noObject.indexOf(resType) < 0) {
-        logger.warn('accessing an object');
+        logger.warn("accessing an object");
         return `key '${keys[keys.length - 1]} (${topOptions.lng})' returned an object instead of string.`;
       } else {
         // string, empty or null
@@ -388,7 +373,7 @@
         }
 
         if (usedKey || usedDefault) {
-          logger.log('missingKey', topOptions.lng, keys[keys.length - 1], res);
+          logger.log("missingKey", topOptions.lng, keys[keys.length - 1], res);
         } // extend
 
 
@@ -411,14 +396,14 @@
     };
   };
 
-  const makeString = object => object == null ? '' : `${object}`;
+  const makeString = object => object == null ? "" : `${object}`;
 
-  const cleanKey = key => key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  const cleanKey = key => key && key.indexOf("###") > -1 ? key.replace(/###/g, ".") : key;
 
   const getLastOfPath = (object, path) => {
-    const canNotTraverseDeeper = () => !object || typeof object === 'string';
+    const canNotTraverseDeeper = () => !object || typeof object === "string";
 
-    const stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
+    const stack = typeof path !== "string" ? [].concat(path) : path.split(".");
 
     while (stack.length > 1) {
       if (canNotTraverseDeeper()) return {};
@@ -443,30 +428,30 @@
   };
   const regexEscape = str =>
   /* eslint no-useless-escape: 0 */
-  str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+  str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   const entityMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-    '/': '&#x2F;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+    "/": "&#x2F;"
   };
-  const escape = data => typeof data === 'string' ? data.replace(/[&<>"'\/]/g, s => entityMap[s]) : data;
+  const escape = data => typeof data === "string" ? data.replace(/[&<>"'\/]/g, s => entityMap[s]) : data;
 
-  const prefix = '{{';
-  const suffix = '}}';
-  const formatSeparator = ',';
-  const unescapePrefix = '-';
-  const unescapeSuffix = '';
-  const nestingPrefix = regexEscape('$t(');
-  const nestingSuffix = regexEscape(')');
-  const nestingOptionsSeparator = ',';
+  const prefix = "{{";
+  const suffix = "}}";
+  const formatSeparator = ",";
+  const unescapePrefix = "-";
+  const unescapeSuffix = "";
+  const nestingPrefix = regexEscape("$t(");
+  const nestingSuffix = regexEscape(")");
+  const nestingOptionsSeparator = ",";
 
-  const regexSafe = val => val.replace(/\$/g, '$$$$');
+  const regexSafe = val => val.replace(/\$/g, "$$$$");
 
   const Interpolator = (options = {}) => {
-    const logger = baseLogger.create('interpolator');
+    const logger = baseLogger.create("interpolator");
 
     const format = options.interpolationFormat || (value => value);
 
@@ -474,9 +459,9 @@
     let regexp, regexpUnescape, regexpNesting;
 
     const _resetRegExp = () => {
-      regexp = new RegExp(`${prefix}(.+?)${suffix}`, 'g');
-      regexpUnescape = new RegExp(`${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`, 'g');
-      regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
+      regexp = new RegExp(`${prefix}(.+?)${suffix}`, "g");
+      regexpUnescape = new RegExp(`${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`, "g");
+      regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, "g");
     };
 
     _resetRegExp();
@@ -506,8 +491,8 @@
 
         if (value === undefined) {
           logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-          value = '';
-        } else if (typeof value !== 'string') {
+          value = "";
+        } else if (typeof value !== "string") {
           value = makeString(value);
         }
 
@@ -527,8 +512,8 @@
 
         if (value === undefined) {
           logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-          value = '';
-        } else if (typeof value !== 'string') {
+          value = "";
+        } else if (typeof value !== "string") {
           value = makeString(value);
         }
 
@@ -599,13 +584,13 @@
 
         value = t(handleHasOptions(match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
 
-        if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
+        if (value && match[0] === str && typeof value !== "string") return value; // no string to include or empty
 
-        if (typeof value !== 'string') value = makeString(value);
+        if (typeof value !== "string") value = makeString(value);
 
         if (!value) {
           logger.warn(`missed to resolve ${match[1]} for nesting ${str}`);
-          value = '';
+          value = "";
         }
 
         if (doReduce) {
@@ -637,7 +622,7 @@
     interpolationFormat: (value, _format, _lng, _options) => value,
     logger: undefined
   };
-  const rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
+  const rtlLngs = ["ar", "shu", "sqr", "ssh", "xaa", "yhd", "yud", "aao", "abh", "abv", "acm", "acq", "acw", "acx", "acy", "adf", "ads", "aeb", "aec", "afb", "ajp", "apc", "apd", "arb", "arq", "ars", "ary", "arz", "auz", "avl", "ayh", "ayl", "ayn", "ayp", "bbz", "pga", "he", "iw", "ps", "pbt", "pbu", "pst", "prp", "prd", "ur", "ydd", "yds", "yih", "ji", "yi", "hbo", "men", "xmn", "fa", "jpr", "peo", "pes", "prs", "dv", "sam"];
 
   const I18n = (options = {}) => {
     options = { ...defaults,
@@ -649,7 +634,7 @@
     const logger = baseLogger;
 
     if (!options.lng) {
-      logger.warn('init: no lng is defined');
+      logger.warn("init: no lng is defined");
     }
 
     const interpolator = Interpolator(options);
@@ -660,10 +645,10 @@
       translator,
       t: (...args) => translator.translate(...args),
       exists: (...args) => translator.exists(...args),
-      dir: lng => !lng ? 'rtl' : rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr'
+      dir: lng => !lng ? "rtl" : rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? "rtl" : "ltr"
     };
   };
 
   return I18n;
 
-}));
+})));

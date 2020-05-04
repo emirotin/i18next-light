@@ -13,6 +13,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["./index.d.ts", "./test/**/*.ts*"],
-  "exclude": ["test/typescript/nonEsModuleInterop/**/*.ts"]
+  "include": ["./index.d.ts", "./test/**/*.ts*"]
 }

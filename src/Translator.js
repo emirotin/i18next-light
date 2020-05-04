@@ -1,48 +1,34 @@
-import baseLogger from './logger.js';
-import pluralResolver from './PluralResolver.js';
+import baseLogger from "./logger.js";
+import pluralResolver from "./PluralResolver.js";
 
-const contextSeparator = '_';
+const contextSeparator = "_";
 
 const Translator = (interpolator, options = {}) => {
-  const logger = baseLogger.create('translator');
+  const logger = baseLogger.create("translator");
   const topOptions = options;
   const resources = options.resources || {};
 
   const resolve = (keys, options = {}) => {
-    if (typeof keys === 'string') {
+    if (typeof keys === "string") {
       keys = [keys];
     }
 
-    const needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+    const needsPluralHandling = options.count !== undefined && typeof options.count !== "string";
     const needsContextHandling =
-      options.context !== undefined &&
-      typeof options.context === 'string' &&
-      options.context !== '';
+      options.context !== undefined && typeof options.context === "string" && options.context !== "";
+
+    const pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(topOptions.lng, options.count);
+    const contextSuffix = needsContextHandling && `${contextSeparator}${options.context}`;
 
     for (const key of keys) {
-      const keyVariants = [key];
+      const keyVariants = [
+        needsPluralHandling && needsContextHandling && `${key}${contextSuffix}${pluralSuffix}`,
+        needsContextHandling && `${key}${contextSuffix}`,
+        needsPluralHandling && `${key}${pluralSuffix}`,
+        key,
+      ].filter(Boolean);
 
-      const pluralSuffix =
-        needsPluralHandling && pluralResolver.getSuffix(topOptions.lng, options.count);
-
-      let finalKey = key;
-      // fallback for plural if context not found
-      if (needsPluralHandling && needsContextHandling) {
-        keyVariants.push(finalKey + pluralSuffix);
-      }
-
-      // get key for context if needed
-      if (needsContextHandling) {
-        finalKey += `${contextSeparator}${options.context}`;
-        keyVariants.push(finalKey);
-      }
-
-      // get key for plural if needed
-      if (needsPluralHandling) {
-        keyVariants.push(finalKey + pluralSuffix);
-      }
-
-      for (const keyVariant of keyVariants.reverse()) {
+      for (const keyVariant of keyVariants) {
         const res = resources[keyVariant];
 
         if (res !== undefined) {
@@ -58,14 +44,14 @@ const Translator = (interpolator, options = {}) => {
   };
 
   const translate = (keys, options = {}) => {
-    if (typeof options === 'string') {
+    if (typeof options === "string") {
       options = {
         defaultValue: options,
       };
     }
 
     // non valid keys handling
-    if (keys == null) return '';
+    if (keys == null) return "";
     if (!Array.isArray(keys)) keys = [String(keys)];
 
     // resolve from store
@@ -73,16 +59,13 @@ const Translator = (interpolator, options = {}) => {
     let res = resolved && resolved.res;
 
     const resType = Object.prototype.toString.apply(res);
-    const noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
+    const noObject = ["[object Number]", "[object Function]", "[object RegExp]"];
 
     // object
-    const handleAsObject =
-      typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
+    const handleAsObject = typeof res !== "string" && typeof res !== "boolean" && typeof res !== "number";
     if (res && handleAsObject && noObject.indexOf(resType) < 0) {
-      logger.warn('accessing an object');
-      return `key '${keys[keys.length - 1]} (${
-        topOptions.lng
-      })' returned an object instead of string.`;
+      logger.warn("accessing an object");
+      return `key '${keys[keys.length - 1]} (${topOptions.lng})' returned an object instead of string.`;
     } else {
       // string, empty or null
       let usedDefault = false;
@@ -104,7 +87,7 @@ const Translator = (interpolator, options = {}) => {
       }
 
       if (usedKey || usedDefault) {
-        logger.log('missingKey', topOptions.lng, keys[keys.length - 1], res);
+        logger.log("missingKey", topOptions.lng, keys[keys.length - 1], res);
       }
 
       // extend
