@@ -2,9 +2,7 @@ import pluralResolver from '../src/PluralResolver';
 
 describe('PluralResolver', () => {
   describe('needsPlural()', () => {
-    const pr = pluralResolver;
-
-    var tests = [
+    const tests = [
       { args: ['en'], expected: true },
       { args: ['fr'], expected: true },
       { args: ['ar'], expected: true },
@@ -37,15 +35,13 @@ describe('PluralResolver', () => {
 
     tests.forEach(test => {
       it('correctly returns needsPlural for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(pr.needsPlural.apply(pr, test.args)).to.eql(test.expected);
+        expect(pluralResolver.needsPlural(...test.args)).to.eql(test.expected);
       });
     });
   });
 
   describe('getSuffix()', () => {
-    const pr = pluralResolver;
-
-    var tests = [
+    const tests = [
       { args: ['en', 0], expected: 'plural' },
       { args: ['en', 1], expected: '' },
       { args: ['en', 10], expected: 'plural' },
@@ -197,15 +193,15 @@ describe('PluralResolver', () => {
 
     tests.forEach(test => {
       it('correctly returns suffix for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(pr.getSuffix.apply(pr, test.args)).to.eql(test.expected);
+        expect(pluralResolver.getSuffix(...test.args)).to.eql(
+          test.expected ? '_' + test.expected : test.expected,
+        );
       });
     });
   });
 
   describe('getPluralFormsOfKey()', () => {
-    const pr = pluralResolver;
-
-    var tests = [
+    const tests = [
       { args: ['en', 'key'], expected: ['key', 'key_plural'] },
       { args: ['ar', 'key'], expected: ['key_0', 'key_1', 'key_2', 'key_3', 'key_4', 'key_5'] },
     ];
@@ -214,7 +210,7 @@ describe('PluralResolver', () => {
       it(
         'correctly returns pluralforms of a given key for ' + JSON.stringify(test.args) + ' args',
         () => {
-          expect(pr.getPluralFormsOfKey.apply(pr, test.args)).to.eql(test.expected);
+          expect(pluralResolver.getPluralFormsOfKey(...test.args)).to.eql(test.expected);
         },
       );
     });

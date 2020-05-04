@@ -38,6 +38,8 @@ const getSuffix = (code, count) => {
 };
 
 const pluralResolver = {
+  getSuffix,
+
   needsPlural: code => {
     const rule = getRule(code);
     return rule && rule.numbers.length > 1;

@@ -25,6 +25,8 @@ const Interpolator = (options = {}) => {
     regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
   };
 
+  _resetRegExp();
+
   const interpolate = (str, data, lng, options) => {
     const handleFormat = key => {
       if (key.indexOf(formatSeparator) < 0) {
@@ -156,7 +158,7 @@ const Interpolator = (options = {}) => {
       str = str.replace(match[0], value);
       // TODO: was `regexp`
       // https://github.com/i18next/i18next/blob/master/src/Interpolator.js#L224
-      nestingRegexp.lastIndex = 0;
+      regexpNesting.lastIndex = 0;
     }
     return str;
   };

@@ -1,54 +1,34 @@
 import Translator from '../../src/Translator';
-import ResourceStore from '../../src/ResourceStore.js';
 import Interpolator from '../../src/Interpolator';
 
 describe('Translator', () => {
   describe('translate() with combined functionality', () => {
-    var t;
+    let t;
 
     before(() => {
-      const rs = new ResourceStore({
-        en: {
-          translation: {
-            key1: 'hello world',
-            key2: 'It is: $t(key1)',
-            key3: 'It is: {{val}}',
+      t = Translator(Interpolator(), {
+        lng: 'en',
+        resources: {
+          key1: 'hello world',
+          key2: 'It is: $t(key1)',
+          key3: 'It is: {{val}}',
 
-            // context with pluralization
-            test: 'test_en',
-            test_plural: 'tests_en',
-            test_male: 'test_male_en',
-            test_male_plural: 'tests_male_en',
+          // context with pluralization
+          test: 'test_en',
+          test_plural: 'tests_en',
+          test_male: 'test_male_en',
+          test_male_plural: 'tests_male_en',
 
-            nest: {
-              foo: 'bar',
-              nest: '$t(nestedArray)',
-            },
-            nestedArray: [
-              { a: 'b', c: 'd' },
-              { a: 'b', c: 'd' },
-            ],
-          },
+          'nest.nest': 'x $t(nestedVar) y',
+          nestedVar: '_nestedVar_',
         },
       });
-      t = new Translator(
-        {
-          interpolator: new Interpolator(),
-        },
-        {
-          interpolation: {},
-        },
-      );
-      t.changeLanguage('en');
     });
 
-    var tests = [
+    const tests = [
       // interpolation and nesting in var
       { args: ['key2'], expected: 'It is: hello world' },
       { args: ['key3', { val: '$t(key1)' }], expected: 'It is: hello world' },
-
-      // disable nesting while interpolation
-      { args: ['key3', { val: '$t(key1)', nest: false }], expected: 'It is: $t(key1)' },
 
       // context with pluralization
       { args: ['test', { context: 'unknown', count: 1 }], expected: 'test_en' },
@@ -56,14 +36,8 @@ describe('Translator', () => {
       { args: ['test', { context: 'male', count: 1 }], expected: 'test_male_en' },
       { args: ['test', { context: 'male', count: 2 }], expected: 'tests_male_en' },
       {
-        args: ['nest'],
-        expected: {
-          foo: 'bar',
-          nest: [
-            { a: 'b', c: 'd' },
-            { a: 'b', c: 'd' },
-          ],
-        },
+        args: ['nest.nest'],
+        expected: 'x _nestedVar_ y',
       },
 
       // interpolation and nesting on defaultValue
@@ -75,7 +49,7 @@ describe('Translator', () => {
 
     tests.forEach(test => {
       it('correctly translates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(t.translate.apply(t, test.args)).to.eql(test.expected);
+        expect(t.translate(...test.args)).to.eql(test.expected);
       });
     });
   });

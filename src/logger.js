@@ -15,13 +15,11 @@ const consoleLogger = {
 const Logger = (concreteLogger = consoleLogger, options = {}) => {
   let logger, prefix, _options, debug;
 
-  init(concreteLogger, options);
-
-  const init = (concreteLogger = consoleLogger, options = {}) => {
+  const init = (concreteLogger = consoleLogger, options) => {
     logger = concreteLogger;
-    prefix = options.prefix || 'i18next:';
-    _options = options;
-    debug = options.debug;
+    _options = options || _options;
+    prefix = _options.prefix || 'i18next:';
+    debug = _options.debug;
   };
 
   const setDebug = bool => {
@@ -49,7 +47,9 @@ const Logger = (concreteLogger = consoleLogger, options = {}) => {
       ..._options,
     });
 
-  return { setDebug, log, warn, error, deprecate, create };
+  init(concreteLogger, options);
+
+  return { init, setDebug, log, warn, error, deprecate, create };
 };
 
 export default Logger();

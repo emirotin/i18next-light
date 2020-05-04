@@ -1,57 +1,28 @@
 import Translator from '../../src/Translator';
-import ResourceStore from '../../src/ResourceStore.js';
 import Interpolator from '../../src/Interpolator';
 
 describe('Translator', () => {
   describe('translate()', () => {
-    var t;
+    let t;
 
     before(() => {
-      const rs = new ResourceStore({
-        en: {
-          translation: {
-            test: 'test_en',
-            deep: {
-              test: 'deep_en',
-            },
-          },
-        },
-        de: {
-          translation: {
-            test: 'test_de',
-          },
+      t = Translator(Interpolator(), {
+        lng: 'en',
+        resources: {
+          test: 'test_en',
+          'deep.test': 'deep_en',
         },
       });
-      t = new Translator(
-        {
-          interpolator: new Interpolator(),
-        },
-        {
-          interpolation: {
-            interpolateResult: true,
-            interpolateDefaultValue: true,
-            interpolateKey: true,
-          },
-        },
-      );
-      t.changeLanguage('en');
     });
 
-    var tests = [
-      { args: ['translation:test'], expected: 'test_en' },
-      { args: ['translation:test', { lngs: ['en-US', 'en'] }], expected: 'test_en' },
-      { args: ['translation:test', { lngs: ['de'] }], expected: 'test_de' },
-      { args: ['translation:test', { lng: 'de' }], expected: 'test_de' },
-      { args: ['translation:test', { lng: 'fr' }], expected: 'test_en' },
-      { args: ['translation:test', { lng: 'en-US' }], expected: 'test_en' },
-      { args: ['translation.test', { lng: 'en-US', nsSeparator: '.' }], expected: 'test_en' },
-      { args: ['translation.deep.test', { lng: 'en-US', nsSeparator: '.' }], expected: 'deep_en' },
-      { args: ['deep.test', { lng: 'en-US', nsSeparator: '.' }], expected: 'deep_en' },
+    const tests = [
+      { args: ['test'], expected: 'test_en' },
+      { args: ['deep.test'], expected: 'deep_en' },
     ];
 
     tests.forEach(test => {
       it('correctly translates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(t.translate.apply(t, test.args)).to.eql(test.expected);
+        expect(t.translate(...test.args)).to.eql(test.expected);
       });
     });
   });
