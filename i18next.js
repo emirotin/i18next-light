@@ -19,28 +19,6 @@
     return obj;
   }
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-  }
-
   function _arrayLikeToArray(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
 
@@ -81,103 +59,102 @@
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
   var consoleLogger = {
-    type: 'logger',
-    log: function log(args) {
-      this.output('log', args);
-    },
-    warn: function warn(args) {
-      this.output('warn', args);
-    },
-    error: function error(args) {
-      this.output('error', args);
-    },
-    output: function output(type, args) {
+    log: function log() {
       var _console;
 
-      /* eslint no-console: 0 */
-      if (console && console[type]) (_console = console)[type].apply(_console, _toConsumableArray(args));
+      console && (_console = console).log.apply(_console, arguments);
+    },
+    warn: function warn() {
+      var _console2;
+
+      console && (_console2 = console).warn.apply(_console2, arguments);
+    },
+    error: function error() {
+      var _console3;
+
+      console && (_console3 = console).error.apply(_console3, arguments);
     }
   };
 
-  var Logger = /*#__PURE__*/function () {
-    function Logger(concreteLogger) {
+  var Logger = function Logger() {
+    var concreteLogger = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : consoleLogger;
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var logger, prefix, _options, debug;
+
+    init(concreteLogger, options);
+
+    var init = function init() {
+      var concreteLogger = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : consoleLogger;
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      logger = concreteLogger;
+      prefix = options.prefix || 'i18next:';
+      _options = options;
+      debug = options.debug;
+    };
 
-      _classCallCheck(this, Logger);
+    var setDebug = function setDebug(bool) {
+      debug = bool;
+    };
 
-      this.init(concreteLogger, options);
-    }
+    var forward = function forward(args, lvl, extraPrefix, debugOnly) {
+      var _logger;
 
-    _createClass(Logger, [{
-      key: "init",
-      value: function init(concreteLogger) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        this.prefix = options.prefix || 'i18next:';
-        this.logger = concreteLogger || consoleLogger;
-        this.options = options;
-        this.debug = options.debug;
+      if (debugOnly && !debug) return null;
+      args = _toConsumableArray(args);
+      if (typeof args[0] === 'string') args[0] = "".concat(extraPrefix).concat(prefix, " ").concat(args[0]);
+      return (_logger = logger)[lvl].apply(_logger, _toConsumableArray(args));
+    };
+
+    var log = function log() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
       }
-    }, {
-      key: "setDebug",
-      value: function setDebug(bool) {
-        this.debug = bool;
-      }
-    }, {
-      key: "log",
-      value: function log() {
-        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
 
-        return this.forward(args, 'log', '', true);
-      }
-    }, {
-      key: "warn",
-      value: function warn() {
-        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-          args[_key2] = arguments[_key2];
-        }
+      return forward(args, 'log', '', true);
+    };
 
-        return this.forward(args, 'warn', '', true);
+    var warn = function warn() {
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
       }
-    }, {
-      key: "error",
-      value: function error() {
-        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-          args[_key3] = arguments[_key3];
-        }
 
-        return this.forward(args, 'error', '');
-      }
-    }, {
-      key: "deprecate",
-      value: function deprecate() {
-        for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-          args[_key4] = arguments[_key4];
-        }
+      return forward(args, 'warn', '', true);
+    };
 
-        return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+    var error = function error() {
+      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
-    }, {
-      key: "forward",
-      value: function forward(args, lvl, prefix, debugOnly) {
-        if (debugOnly && !this.debug) return null;
-        if (typeof args[0] === 'string') args[0] = "".concat(prefix).concat(this.prefix, " ").concat(args[0]);
-        return this.logger[lvl](args);
-      }
-    }, {
-      key: "create",
-      value: function create(moduleName) {
-        return new Logger(this.logger, _objectSpread(_objectSpread({}, {
-          prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
-        }), this.options));
-      }
-    }]);
 
-    return Logger;
-  }();
+      return forward(args, 'error', '');
+    };
 
-  var baseLogger = new Logger();
+    var deprecate = function deprecate() {
+      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      return forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+    };
+
+    var create = function create(moduleName) {
+      return Logger(logger, _objectSpread(_objectSpread({}, {
+        prefix: "".concat(prefix, ":").concat(moduleName, ":")
+      }), _options));
+    };
+
+    return {
+      setDebug: setDebug,
+      log: log,
+      warn: warn,
+      error: error,
+      deprecate: deprecate,
+      create: create
+    };
+  };
+
+  var baseLogger = Logger();
 
   var capitalize = function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -529,189 +506,179 @@
     return val.replace(/\$/g, '$$$$');
   };
 
-  var Interpolator = /*#__PURE__*/function () {
-    function Interpolator() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var Interpolator = function Interpolator() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var logger = baseLogger.create('interpolator');
 
-      _classCallCheck(this, Interpolator);
+    var format = options.interpolationFormat || function (value) {
+      return value;
+    };
 
-      this.logger = baseLogger.create('interpolator');
+    var maxReplaces = options.maxReplaces || 1000;
+    var regexp, regexpUnescape, regexpNesting;
 
-      this.format = options.interpolationFormat || function (value) {
-        return value;
+    var _resetRegExp = function _resetRegExp() {
+      regexp = new RegExp("".concat(prefix, "(.+?)").concat(suffix), 'g');
+      regexpUnescape = new RegExp("".concat(prefix).concat(unescapePrefix, "(.+?)").concat(unescapeSuffix).concat(suffix), 'g');
+      regexpNesting = new RegExp("".concat(nestingPrefix, "(.+?)").concat(nestingSuffix), 'g');
+    };
+
+    var interpolate = function interpolate(str, data, lng, options) {
+      var handleFormat = function handleFormat(key) {
+        if (key.indexOf(formatSeparator) < 0) {
+          return getPath(data, key);
+        }
+
+        var p = key.split(formatSeparator);
+        var k = p.shift().trim();
+        var f = p.join(formatSeparator).trim();
+        return format(getPath(data, k), f, lng, options);
       };
 
-      this.maxReplaces = options.maxReplaces || 1000;
-    }
+      _resetRegExp();
 
-    _createClass(Interpolator, [{
-      key: "_resetRegExp",
-      value: function _resetRegExp() {
-        // the regexp
-        this.regexp = new RegExp("".concat(prefix, "(.+?)").concat(suffix), 'g');
-        this.regexpUnescape = new RegExp("".concat(prefix).concat(unescapePrefix, "(.+?)").concat(unescapeSuffix).concat(suffix), 'g');
-        this.nestingRegexp = new RegExp("".concat(nestingPrefix, "(.+?)").concat(nestingSuffix), 'g');
-      }
-    }, {
-      key: "interpolate",
-      value: function interpolate(str, data, lng, options) {
-        var _this = this;
+      var match;
+      var replaces;
+      replaces = 0; // unescape
 
-        var handleFormat = function handleFormat(key) {
-          if (key.indexOf(formatSeparator) < 0) {
-            return getPath(data, key);
-          }
+      /* eslint no-cond-assign: 0 */
 
-          var p = key.split(formatSeparator);
-          var k = p.shift().trim();
-          var f = p.join(formatSeparator).trim();
-          return _this.format(getPath(data, k), f, lng, options);
-        };
+      while (match = regexpUnescape.exec(str)) {
+        var value = handleFormat(match[1].trim());
 
-        this._resetRegExp();
-
-        var match;
-        var replaces;
-        replaces = 0; // unescape
-
-        /* eslint no-cond-assign: 0 */
-
-        while (match = this.regexpUnescape.exec(str)) {
-          var value = handleFormat(match[1].trim());
-
-          if (value === undefined) {
-            this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-            value = '';
-          } else if (typeof value !== 'string') {
-            value = makeString(value);
-          }
-
-          str = str.replace(match[0], regexSafe(value));
-          this.regexpUnescape.lastIndex = 0;
-          replaces++;
-
-          if (replaces >= this.maxReplaces) {
-            break;
-          }
+        if (value === undefined) {
+          logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+          value = '';
+        } else if (typeof value !== 'string') {
+          value = makeString(value);
         }
 
-        replaces = 0; // regular escape on demand
+        str = str.replace(match[0], regexSafe(value));
+        regexpUnescape.lastIndex = 0;
+        replaces++;
 
-        while (match = this.regexp.exec(str)) {
-          var _value = handleFormat(match[1].trim());
+        if (replaces >= maxReplaces) {
+          break;
+        }
+      }
 
-          if (_value === undefined) {
-            this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-            _value = '';
-          } else if (typeof _value !== 'string') {
-            _value = makeString(_value);
-          }
+      replaces = 0; // regular escape on demand
 
-          _value = regexSafe(escape(_value));
-          str = str.replace(match[0], _value);
-          this.regexp.lastIndex = 0;
-          replaces++;
+      while (match = regexp.exec(str)) {
+        var _value = handleFormat(match[1].trim());
 
-          if (replaces >= this.maxReplaces) {
-            break;
-          }
+        if (_value === undefined) {
+          logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+          _value = '';
+        } else if (typeof _value !== 'string') {
+          _value = makeString(_value);
         }
 
-        return str;
+        _value = regexSafe(escape(_value));
+        str = str.replace(match[0], _value);
+        regexp.lastIndex = 0;
+        replaces++;
+
+        if (replaces >= maxReplaces) {
+          break;
+        }
       }
-    }, {
-      key: "nest",
-      value: function nest(str, t, lng) {
-        var _this2 = this;
 
-        var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-        var match;
-        var value;
+      return str;
+    };
 
-        var clonedOptions = _objectSpread$1({}, options);
+    var nest = function nest(str, t, lng) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      var match;
+      var value;
 
-        delete clonedOptions.defaultValue; // assert we do not get a endless loop on interpolating defaultValue again and again
-        // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
+      var clonedOptions = _objectSpread$1({}, options);
 
-        var handleHasOptions = function handleHasOptions(key, inheritedOptions) {
-          var sep = nestingOptionsSeparator;
-          if (key.indexOf(sep) < 0) return key;
-          var c = key.split(new RegExp("".concat(sep, "[ ]*{")));
-          var optionsString = "{".concat(c[1]);
-          key = c[0];
-          optionsString = _this2.interpolate(optionsString, clonedOptions);
-          optionsString = optionsString.replace(/'/g, '"');
+      delete clonedOptions.defaultValue; // assert we do not get a endless loop on interpolating defaultValue again and again
+      // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
 
-          try {
-            clonedOptions = JSON.parse(optionsString);
-            if (inheritedOptions) clonedOptions = _objectSpread$1(_objectSpread$1({}, inheritedOptions), clonedOptions);
-          } catch (e) {
-            _this2.logger.warn("failed parsing options string in nesting for key ".concat(key), e);
+      var handleHasOptions = function handleHasOptions(key, inheritedOptions) {
+        var sep = nestingOptionsSeparator;
+        if (key.indexOf(sep) < 0) return key;
+        var c = key.split(new RegExp("".concat(sep, "[ ]*{")));
+        var optionsString = "{".concat(c[1]);
+        key = c[0];
+        optionsString = interpolate(optionsString, clonedOptions);
+        optionsString = optionsString.replace(/'/g, '"');
 
-            return "".concat(key).concat(sep).concat(optionsString);
-          } // assert we do not get a endless loop on interpolating defaultValue again and again
-
-
-          delete clonedOptions.defaultValue;
-          return key;
-        }; // regular escape on demand
+        try {
+          clonedOptions = JSON.parse(optionsString);
+          if (inheritedOptions) clonedOptions = _objectSpread$1(_objectSpread$1({}, inheritedOptions), clonedOptions);
+        } catch (e) {
+          logger.warn("failed parsing options string in nesting for key ".concat(key), e);
+          return "".concat(key).concat(sep).concat(optionsString);
+        } // assert we do not get a endless loop on interpolating defaultValue again and again
 
 
-        while (match = this.nestingRegexp.exec(str)) {
-          var formatters = [];
-          /**
-           * If there is more than one parameter (contains the format separator). E.g.:
-           *   - t(a, b)
-           *   - t(a, b, c)
-           *
-           * And those parameters are not dynamic values (parameters do not include curly braces). E.g.:
-           *   - Not t(a, { "key": "{{variable}}" })
-           *   - Not t(a, b, {"keyA": "valueA", "keyB": "valueB"})
-           */
-
-          var doReduce = false;
-
-          if (match[0].includes(formatSeparator) && !/{.*}/.test(match[1])) {
-            var _match$1$split$map = match[1].split(formatSeparator).map(function (elem) {
-              return elem.trim();
-            });
-
-            var _match$1$split$map2 = _toArray(_match$1$split$map);
-
-            match[1] = _match$1$split$map2[0];
-            formatters = _match$1$split$map2.slice(1);
-            doReduce = true;
-          }
-
-          value = t(handleHasOptions(match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
-
-          if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
-
-          if (typeof value !== 'string') value = makeString(value);
-
-          if (!value) {
-            this.logger.warn("missed to resolve ".concat(match[1], " for nesting ").concat(str));
-            value = '';
-          }
-
-          if (doReduce) {
-            value = formatters.reduce(function (v, f) {
-              return _this2.format(v, f, lng, options);
-            }, value.trim());
-          } // Nested keys should not be escaped by default #854
-          // value = regexSafe(utils.escape(value));
+        delete clonedOptions.defaultValue;
+        return key;
+      }; // regular escape on demand
 
 
-          str = str.replace(match[0], value);
-          this.regexp.lastIndex = 0;
+      while (match = regexpNesting.exec(str)) {
+        var formatters = [];
+        /**
+         * If there is more than one parameter (contains the format separator). E.g.:
+         *   - t(a, b)
+         *   - t(a, b, c)
+         *
+         * And those parameters are not dynamic values (parameters do not include curly braces). E.g.:
+         *   - Not t(a, { "key": "{{variable}}" })
+         *   - Not t(a, b, {"keyA": "valueA", "keyB": "valueB"})
+         */
+
+        var doReduce = false;
+
+        if (match[0].includes(formatSeparator) && !/{.*}/.test(match[1])) {
+          var _match$1$split$map = match[1].split(formatSeparator).map(function (elem) {
+            return elem.trim();
+          });
+
+          var _match$1$split$map2 = _toArray(_match$1$split$map);
+
+          match[1] = _match$1$split$map2[0];
+          formatters = _match$1$split$map2.slice(1);
+          doReduce = true;
         }
 
-        return str;
-      }
-    }]);
+        value = t(handleHasOptions(match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
 
-    return Interpolator;
-  }();
+        if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
+
+        if (typeof value !== 'string') value = makeString(value);
+
+        if (!value) {
+          logger.warn("missed to resolve ".concat(match[1], " for nesting ").concat(str));
+          value = '';
+        }
+
+        if (doReduce) {
+          value = formatters.reduce(function (v, f) {
+            return format(v, f, lng, options);
+          }, value.trim());
+        } // Nested keys should not be escaped by default #854
+        // value = regexSafe(utils.escape(value));
+
+
+        str = str.replace(match[0], value); // TODO: was `regexp`
+        // https://github.com/i18next/i18next/blob/master/src/Interpolator.js#L224
+
+        nestingRegexp.lastIndex = 0;
+      }
+
+      return str;
+    };
+
+    return {
+      interpolate: interpolate,
+      nest: nest
+    };
+  };
 
   function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray$1(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -720,220 +687,189 @@
   function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
   var contextSeparator = '_';
 
-  var Translator = /*#__PURE__*/function () {
-    function Translator() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var Translator = function Translator() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var interpolator = new Interpolator(options);
+    var logger = baseLogger.create('translator');
+    var topOptions = options;
 
-      _classCallCheck(this, Translator);
+    var resolve = function resolve(keys) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      this.interpolator = new Interpolator(options);
-      this.options = options;
-      this.logger = baseLogger.create('translator');
-    }
-
-    _createClass(Translator, [{
-      key: "exists",
-      value: function exists(key, options) {
-        var resolved = this.resolve(key, options);
-        return resolved && resolved.res !== undefined;
+      if (typeof keys === 'string') {
+        keys = [keys];
       }
-    }, {
-      key: "translate",
-      value: function translate(keys) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (typeof options === 'string') {
-          options = {
-            defaultValue: options
-          };
-        } // non valid keys handling
+      var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+      var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+
+      var _iterator = _createForOfIteratorHelper(keys),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _key = _step.value;
+          var keyVariants = [_key];
+          var pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(topOptions.lng, options.count);
+          var finalKey = _key; // fallback for plural if context not found
+
+          if (needsPluralHandling && needsContextHandling) {
+            keyVariants.push(finalKey + pluralSuffix);
+          } // get key for context if needed
 
 
-        if (keys == null) return '';
-        if (!Array.isArray(keys)) keys = [String(keys)]; // resolve from store
+          if (needsContextHandling) {
+            finalKey += "".concat(contextSeparator).concat(options.context);
+            keyVariants.push(finalKey);
+          } // get key for plural if needed
 
-        var resolved = this.resolve(keys, options);
-        var res = resolved && resolved.res;
-        var resType = Object.prototype.toString.apply(res);
-        var noObject = ['[object Number]', '[object Function]', '[object RegExp]']; // object
 
-        var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
-        var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
-
-        if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0) {
-          this.logger.warn('accessing an object');
-          return "key '".concat(key, " (").concat(this.options.lng, ")' returned an object instead of string.");
-        } else {
-          // string, empty or null
-          var usedDefault = false;
-          var usedKey = false; // fallback value
-
-          if (res === undefined && options.defaultValue !== undefined) {
-            usedDefault = true;
-
-            if (options.count !== undefined) {
-              var suffix = pluralResolver.getSuffix(this.options.lng, options.count);
-              res = options["defaultValue".concat(suffix)];
-            }
-
-            if (!res) res = options.defaultValue;
+          if (needsPluralHandling) {
+            keyVariants.push(finalKey + pluralSuffix);
           }
 
-          if (res === undefined) {
-            usedKey = true;
-            res = key;
-          }
+          var _iterator2 = _createForOfIteratorHelper(keyVariants.reverse()),
+              _step2;
 
-          if (usedKey || usedDefault) {
-            this.logger.log('missingKey', this.options.lng, key, res);
-          } // extend
+          try {
+            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+              var keyVariant = _step2.value;
+              var res = topOptions.resources[keyVariant];
 
-
-          res = this.extendTranslation(res, options);
-        } // return
-
-
-        return res;
-      }
-    }, {
-      key: "extendTranslation",
-      value: function extendTranslation(res, options) {
-        var _this = this;
-
-        var newRes = this.interpolator.interpolate(res, options, this.options.lng, options);
-        return this.interpolator.nest(newRes, function () {
-          return _this.translate.apply(_this, arguments);
-        }, this.options.lng, options);
-      }
-    }, {
-      key: "resolve",
-      value: function resolve(keys) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (typeof keys === 'string') {
-          keys = [keys];
-        }
-
-        var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-        var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
-
-        var _iterator = _createForOfIteratorHelper(keys),
-            _step;
-
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var _key = _step.value;
-            var keyVariants = [_key];
-            var pluralSuffix = needsPluralHandling && pluralResolver.getSuffix(this.options.lng, options.count);
-            var finalKey = _key; // fallback for plural if context not found
-
-            if (needsPluralHandling && needsContextHandling) {
-              keyVariants.push(finalKey + pluralSuffix);
-            } // get key for context if needed
-
-
-            if (needsContextHandling) {
-              finalKey += "".concat(contextSeparator).concat(options.context);
-              keyVariants.push(finalKey);
-            } // get key for plural if needed
-
-
-            if (needsPluralHandling) {
-              keyVariants.push(finalKey + pluralSuffix);
-            }
-
-            var _iterator2 = _createForOfIteratorHelper(keyVariants.reverse()),
-                _step2;
-
-            try {
-              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-                var keyVariant = _step2.value;
-                var res = this.resources[keyVariant];
-
-                if (res !== undefined) {
-                  return {
-                    res: res,
-                    usedKey: _key,
-                    exactUsedKey: keyVariant
-                  };
-                }
+              if (res !== undefined) {
+                return {
+                  res: res,
+                  usedKey: _key,
+                  exactUsedKey: keyVariant
+                };
               }
-            } catch (err) {
-              _iterator2.e(err);
-            } finally {
-              _iterator2.f();
             }
+          } catch (err) {
+            _iterator2.e(err);
+          } finally {
+            _iterator2.f();
           }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
         }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
       }
-    }]);
+    };
 
-    return Translator;
-  }();
+    var exists = function exists(key, options) {
+      var resolved = resolve(key, options);
+      return resolved && resolved.res !== undefined;
+    };
 
-  var defaults = {
-    debug: false,
-    resources: {},
-    maxReplaces: 1000,
-    interpolationFormat: function interpolationFormat(value, format, lng, options) {
-      return value;
-    },
-    logger: null
+    var translate = function translate(keys) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (typeof options === 'string') {
+        options = {
+          defaultValue: options
+        };
+      } // non valid keys handling
+
+
+      if (keys == null) return '';
+      if (!Array.isArray(keys)) keys = [String(keys)]; // resolve from store
+
+      var resolved = resolve(keys, options);
+      var res = resolved && resolved.res;
+      var resType = Object.prototype.toString.apply(res);
+      var noObject = ['[object Number]', '[object Function]', '[object RegExp]']; // object
+
+      var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
+
+      if (res && handleAsObject && noObject.indexOf(resType) < 0) {
+        logger.warn('accessing an object');
+        return "key '".concat(key, " (").concat(topOptions.lng, ")' returned an object instead of string.");
+      } else {
+        // string, empty or null
+        var usedDefault = false;
+        var usedKey = false; // fallback value
+
+        if (res === undefined && options.defaultValue !== undefined) {
+          usedDefault = true;
+
+          if (options.count !== undefined) {
+            var suffix = pluralResolver.getSuffix(topOptions.lng, options.count);
+            res = options["defaultValue".concat(suffix)];
+          }
+
+          if (!res) res = options.defaultValue;
+        }
+
+        if (res === undefined) {
+          usedKey = true;
+          res = key;
+        }
+
+        if (usedKey || usedDefault) {
+          logger.log('missingKey', topOptions.lng, key, res);
+        } // extend
+
+
+        res = extendTranslation(res, options);
+      } // return
+
+
+      return res;
+    };
+
+    var extendTranslation = function extendTranslation(res, options) {
+      var newRes = interpolator.interpolate(res, options, topOptions.lng, options);
+      return interpolator.nest(newRes, function () {
+        return translate.apply(void 0, arguments);
+      }, topOptions.lng, options);
+    };
+
+    return {
+      exists: exists,
+      translate: translate,
+      resolve: resolve
+    };
   };
 
   function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
   function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  var defaults = {
+    debug: false,
+    resources: {},
+    maxReplaces: 1000,
+    interpolationFormat: function interpolationFormat(value, _format, _lng, _options) {
+      return value;
+    },
+    logger: null
+  };
   var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
 
-  var I18n = /*#__PURE__*/function () {
-    function I18n() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var I18n = function I18n() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    options = _objectSpread$2(_objectSpread$2({}, defaults), options);
+    var logger = baseLogger;
+    baseLogger.init(options.logger, options);
 
-      _classCallCheck(this, I18n);
-
-      this.options = _objectSpread$2(_objectSpread$2({}, defaults), options);
-      this.logger = baseLogger;
-
-      if (!this.options.lng) {
-        this.logger.warn('init: no lng is defined');
-      }
-
-      baseLogger.init(this.options.logger, this.options);
-      this.translator = new Translator(this.options);
+    if (!options.lng) {
+      logger.warn('init: no lng is defined');
     }
 
-    _createClass(I18n, [{
-      key: "t",
-      value: function t() {
-        var _this$translator;
-
-        return (_this$translator = this.translator).translate.apply(_this$translator, arguments);
+    var translator = new Translator(options);
+    return {
+      t: function t() {
+        return translator.translate.apply(translator, arguments);
+      },
+      exists: function exists() {
+        return translator.exists.apply(translator, arguments);
+      },
+      dir: function dir(lng) {
+        return !lng ? 'rtl' : rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
       }
-    }, {
-      key: "exists",
-      value: function exists() {
-        var _this$translator2;
+    };
+  };
 
-        return (_this$translator2 = this.translator).exists.apply(_this$translator2, arguments);
-      }
-    }, {
-      key: "dir",
-      value: function dir(lng) {
-        if (!lng) return 'rtl';
-        return rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
-      }
-    }]);
-
-    return I18n;
-  }();
-
-  var index = new I18n();
-
-  return index;
+  return I18n;
 
 }));

@@ -12,25 +12,20 @@ const nestingOptionsSeparator = ',';
 
 const regexSafe = val => val.replace(/\$/g, '$$$$');
 
-class Interpolator {
-  constructor(options = {}) {
-    this.logger = baseLogger.create('interpolator');
+const Interpolator = (options = {}) => {
+  const logger = baseLogger.create('interpolator');
 
-    this.format = options.interpolationFormat || (value => value);
-    this.maxReplaces = options.maxReplaces || 1000;
-  }
+  const format = options.interpolationFormat || (value => value);
+  const maxReplaces = options.maxReplaces || 1000;
+  let regexp, regexpUnescape, regexpNesting;
 
-  _resetRegExp() {
-    // the regexp
-    this.regexp = new RegExp(`${prefix}(.+?)${suffix}`, 'g');
-    this.regexpUnescape = new RegExp(
-      `${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`,
-      'g',
-    );
-    this.nestingRegexp = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
-  }
+  const _resetRegExp = () => {
+    regexp = new RegExp(`${prefix}(.+?)${suffix}`, 'g');
+    regexpUnescape = new RegExp(`${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`, 'g');
+    regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
+  };
 
-  interpolate(str, data, lng, options) {
+  const interpolate = (str, data, lng, options) => {
     const handleFormat = key => {
       if (key.indexOf(formatSeparator) < 0) {
         return utils.getPath(data, key);
@@ -40,10 +35,10 @@ class Interpolator {
       const k = p.shift().trim();
       const f = p.join(formatSeparator).trim();
 
-      return this.format(utils.getPath(data, k), f, lng, options);
+      return format(utils.getPath(data, k), f, lng, options);
     };
 
-    this._resetRegExp();
+    _resetRegExp();
 
     let match;
     let replaces;
@@ -51,44 +46,44 @@ class Interpolator {
     replaces = 0;
     // unescape
     /* eslint no-cond-assign: 0 */
-    while ((match = this.regexpUnescape.exec(str))) {
+    while ((match = regexpUnescape.exec(str))) {
       let value = handleFormat(match[1].trim());
       if (value === undefined) {
-        this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
+        logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
         value = '';
       } else if (typeof value !== 'string') {
         value = utils.makeString(value);
       }
       str = str.replace(match[0], regexSafe(value));
-      this.regexpUnescape.lastIndex = 0;
+      regexpUnescape.lastIndex = 0;
       replaces++;
-      if (replaces >= this.maxReplaces) {
+      if (replaces >= maxReplaces) {
         break;
       }
     }
 
     replaces = 0;
     // regular escape on demand
-    while ((match = this.regexp.exec(str))) {
+    while ((match = regexp.exec(str))) {
       let value = handleFormat(match[1].trim());
       if (value === undefined) {
-        this.logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
+        logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
         value = '';
       } else if (typeof value !== 'string') {
         value = utils.makeString(value);
       }
       value = regexSafe(utils.escape(value));
       str = str.replace(match[0], value);
-      this.regexp.lastIndex = 0;
+      regexp.lastIndex = 0;
       replaces++;
-      if (replaces >= this.maxReplaces) {
+      if (replaces >= maxReplaces) {
         break;
       }
     }
     return str;
-  }
+  };
 
-  nest(str, t, lng, options = {}) {
+  const nest = (str, t, lng, options = {}) => {
     let match;
     let value;
 
@@ -104,7 +99,7 @@ class Interpolator {
 
       let optionsString = `{${c[1]}`;
       key = c[0];
-      optionsString = this.interpolate(optionsString, clonedOptions);
+      optionsString = interpolate(optionsString, clonedOptions);
       optionsString = optionsString.replace(/'/g, '"');
 
       try {
@@ -112,7 +107,7 @@ class Interpolator {
 
         if (inheritedOptions) clonedOptions = { ...inheritedOptions, ...clonedOptions };
       } catch (e) {
-        this.logger.warn(`failed parsing options string in nesting for key ${key}`, e);
+        logger.warn(`failed parsing options string in nesting for key ${key}`, e);
         return `${key}${sep}${optionsString}`;
       }
 
@@ -122,7 +117,7 @@ class Interpolator {
     };
 
     // regular escape on demand
-    while ((match = this.nestingRegexp.exec(str))) {
+    while ((match = regexpNesting.exec(str))) {
       let formatters = [];
 
       /**
@@ -148,21 +143,25 @@ class Interpolator {
       // no string to include or empty
       if (typeof value !== 'string') value = utils.makeString(value);
       if (!value) {
-        this.logger.warn(`missed to resolve ${match[1]} for nesting ${str}`);
+        logger.warn(`missed to resolve ${match[1]} for nesting ${str}`);
         value = '';
       }
 
       if (doReduce) {
-        value = formatters.reduce((v, f) => this.format(v, f, lng, options), value.trim());
+        value = formatters.reduce((v, f) => format(v, f, lng, options), value.trim());
       }
 
       // Nested keys should not be escaped by default #854
       // value = regexSafe(utils.escape(value));
       str = str.replace(match[0], value);
-      this.regexp.lastIndex = 0;
+      // TODO: was `regexp`
+      // https://github.com/i18next/i18next/blob/master/src/Interpolator.js#L224
+      nestingRegexp.lastIndex = 0;
     }
     return str;
-  }
-}
+  };
+
+  return { interpolate, nest };
+};
 
 export default Interpolator;

@@ -80,14 +80,14 @@ const I18n = (options = {}) => {
   baseLogger.init(options.logger, options);
 
   if (!options.lng) {
-    this.logger.warn('init: no lng is defined');
+    logger.warn('init: no lng is defined');
   }
 
   const translator = new Translator(options);
 
   return {
     t: (...args) => translator.translate(...args),
-    exists: (...args) => this.translator.exists(...args),
+    exists: (...args) => translator.exists(...args),
     dir: lng =>
       !lng
         ? 'rtl'
