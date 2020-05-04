@@ -1,9 +1,9 @@
 {
-  "name": "i18next",
-  "version": "19.4.4",
-  "description": "i18next internationalization framework",
+  "name": "@emirotin/i18next-light",
+  "version": "1.0.0",
+  "description": "i18next lightweight client-side companion",
   "main": "./dist/cjs/i18next.js",
-  "module": "./dist/esm/i18next.js",
+  "module": "./src/index.js",
   "types": "./index.d.ts",
   "keywords": [
     "i18next",
@@ -15,11 +15,11 @@
     "globalization",
     "gettext"
   ],
-  "homepage": "http://i18next.com",
-  "bugs": "https://github.com/i18next/i18next/issues",
+  "homepage": "https://github.com/emirotin/i18next-light",
+  "bugs": "https://github.com/emirotin/i18next-light/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/i18next/i18next.git"
+    "url": "https://github.com/emirotin/i18next-light.git"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.6"
@@ -82,7 +82,7 @@
     "postversion": "git push && git push --tags",
     "prettier": "prettier --write \"{,**/}*.{ts,tsx,js,json,md}\""
   },
-  "author": "Jan Mühlemann <jan.muehlemann@gmail.com> (https://github.com/jamuhl)",
+  "author": "Eugene Mirotin <emirotin@gmail.com>",
   "license": "MIT",
   "husky": {
     "hooks": {
@@ -97,8 +97,13 @@
       ]
     },
     "ignore": [
-      "**/i18next.js",
-      "**/i18next.min.js"
+      "./i18next-light.js",
+      "./i18next-light.min.js"
     ]
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "> 2%",
+    "not dead"
+  ]
 }
