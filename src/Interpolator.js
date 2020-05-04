@@ -1,34 +1,34 @@
-import * as utils from './utils.js';
-import baseLogger from './logger.js';
+import * as utils from "./utils.js";
+import baseLogger from "./logger.js";
 
-const prefix = '{{';
-const suffix = '}}';
-const formatSeparator = ',';
-const unescapePrefix = '-';
-const unescapeSuffix = '';
-const nestingPrefix = utils.regexEscape('$t(');
-const nestingSuffix = utils.regexEscape(')');
-const nestingOptionsSeparator = ',';
+const prefix = "{{";
+const suffix = "}}";
+const formatSeparator = ",";
+const unescapePrefix = "-";
+const unescapeSuffix = "";
+const nestingPrefix = utils.regexEscape("$t(");
+const nestingSuffix = utils.regexEscape(")");
+const nestingOptionsSeparator = ",";
 
-const regexSafe = val => val.replace(/\$/g, '$$$$');
+const regexSafe = (val) => val.replace(/\$/g, "$$$$");
 
 const Interpolator = (options = {}) => {
-  const logger = baseLogger.create('interpolator');
+  const logger = baseLogger.create("interpolator");
 
-  const format = options.interpolationFormat || (value => value);
+  const format = options.interpolationFormat || ((value) => value);
   const maxReplaces = options.maxReplaces || 1000;
   let regexp, regexpUnescape, regexpNesting;
 
   const _resetRegExp = () => {
-    regexp = new RegExp(`${prefix}(.+?)${suffix}`, 'g');
-    regexpUnescape = new RegExp(`${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`, 'g');
-    regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, 'g');
+    regexp = new RegExp(`${prefix}(.+?)${suffix}`, "g");
+    regexpUnescape = new RegExp(`${prefix}${unescapePrefix}(.+?)${unescapeSuffix}${suffix}`, "g");
+    regexpNesting = new RegExp(`${nestingPrefix}(.+?)${nestingSuffix}`, "g");
   };
 
   _resetRegExp();
 
   const interpolate = (str, data, lng, options) => {
-    const handleFormat = key => {
+    const handleFormat = (key) => {
       if (key.indexOf(formatSeparator) < 0) {
         return utils.getPath(data, key);
       }
@@ -52,8 +52,8 @@ const Interpolator = (options = {}) => {
       let value = handleFormat(match[1].trim());
       if (value === undefined) {
         logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-        value = '';
-      } else if (typeof value !== 'string') {
+        value = "";
+      } else if (typeof value !== "string") {
         value = utils.makeString(value);
       }
       str = str.replace(match[0], regexSafe(value));
@@ -70,8 +70,8 @@ const Interpolator = (options = {}) => {
       let value = handleFormat(match[1].trim());
       if (value === undefined) {
         logger.warn(`missed to pass in variable ${match[1]} for interpolating ${str}`);
-        value = '';
-      } else if (typeof value !== 'string') {
+        value = "";
+      } else if (typeof value !== "string") {
         value = utils.makeString(value);
       }
       value = regexSafe(utils.escape(value));
@@ -133,20 +133,20 @@ const Interpolator = (options = {}) => {
        */
       let doReduce = false;
       if (match[0].includes(formatSeparator) && !/{.*}/.test(match[1])) {
-        [match[1], ...formatters] = match[1].split(formatSeparator).map(elem => elem.trim());
+        [match[1], ...formatters] = match[1].split(formatSeparator).map((elem) => elem.trim());
         doReduce = true;
       }
 
       value = t(handleHasOptions(match[1].trim(), clonedOptions), clonedOptions);
 
       // is only the nesting key (key1 = '$(key2)') return the value without stringify
-      if (value && match[0] === str && typeof value !== 'string') return value;
+      if (value && match[0] === str && typeof value !== "string") return value;
 
       // no string to include or empty
-      if (typeof value !== 'string') value = utils.makeString(value);
+      if (typeof value !== "string") value = utils.makeString(value);
       if (!value) {
         logger.warn(`missed to resolve ${match[1]} for nesting ${str}`);
-        value = '';
+        value = "";
       }
 
       if (doReduce) {

@@ -2,9 +2,7 @@
 .settings.xml
 .monitor
 .DS_Store
-*.orig
-npm-debug.log
-npm-debug.log.*
+*.log
 *.dat
 .vscode
 
@@ -15,9 +13,5 @@ npm-debug.log.*
 
 # Ignore various Node.js related directories and files
 node_modules
-node_modules/**/*
-coverage/**/*
-dist/**/*
-
-# Ignore IntelliJ based IDEs project files
-.idea
+coverage/
+dist/

@@ -1,20 +1,20 @@
-import baseLogger from './logger.js';
-import languageUtils from './LanguageUtils.js';
+import baseLogger from "./logger.js";
+import languageUtils from "./LanguageUtils.js";
 
-import { rules } from './PluralResolverData';
+import { rules } from "./PluralResolverData";
 
-const separator = '_';
+const separator = "_";
 
-const logger = baseLogger.create('pluralResolver');
+const logger = baseLogger.create("pluralResolver");
 
-const getRule = code => rules[code] || rules[languageUtils.getLanguagePartFromCode(code)];
+const getRule = (code) => rules[code] || rules[languageUtils.getLanguagePartFromCode(code)];
 
 const getSuffix = (code, count) => {
   const rule = getRule(code);
 
   if (!rule) {
     logger.warn(`no plural rule found for: ${code}`);
-    return '';
+    return "";
   }
 
   const idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
@@ -24,9 +24,9 @@ const getSuffix = (code, count) => {
     let suffix = rule.numbers[idx];
 
     if (suffix === 2) {
-      suffix = 'plural';
+      suffix = "plural";
     } else if (suffix === 1) {
-      suffix = '';
+      suffix = "";
     }
 
     const suffixStr = suffix.toString();
@@ -40,7 +40,7 @@ const getSuffix = (code, count) => {
 const pluralResolver = {
   getSuffix,
 
-  needsPlural: code => {
+  needsPlural: (code) => {
     const rule = getRule(code);
     return rule && rule.numbers.length > 1;
   },
@@ -50,7 +50,7 @@ const pluralResolver = {
 
     if (!rule) return [];
 
-    return rule.numbers.map(n => {
+    return rule.numbers.map((n) => {
       const suffix = getSuffix(code, n);
       return `${key}${suffix}`;
     });

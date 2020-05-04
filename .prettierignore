@@ -1,2 +1,4 @@
 i18next-light.js
 i18next-light.min.js
+coverage/
+dist/

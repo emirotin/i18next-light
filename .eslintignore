@@ -1,3 +1,4 @@
 **/dist/*
 **/node_modules/*
-**/*.min.*
+i18next-light.js
+i18next-light.min.js

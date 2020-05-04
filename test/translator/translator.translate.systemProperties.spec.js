@@ -1,5 +1,5 @@
-import Translator from '../../src/Translator';
-import Interpolator from '../../src/Interpolator';
+import Translator from "../../src/Translator";
+import Interpolator from "../../src/Interpolator";
 
 // These tests orignated from issues:
 //
@@ -10,28 +10,28 @@ import Interpolator from '../../src/Interpolator';
 // (ex: `.length`, `.search`)
 // when a fallback is needed to find the actual definition of that property
 
-describe('Translator', () => {
-  describe('translate()', () => {
+describe("Translator", () => {
+  describe("translate()", () => {
     let t;
 
     before(() => {
       t = Translator(Interpolator(), {
         resources: {
-          test: 'test_en',
-          'test.length': 'test_length',
-          'test.search': 'test_search',
+          test: "test_en",
+          "test.length": "test_length",
+          "test.search": "test_search",
         },
       });
     });
 
     const tests = [
-      { args: ['test'], expected: 'test_en' },
-      { args: ['test.length'], expected: 'test_length' },
-      { args: ['test.search'], expected: 'test_search' },
+      { args: ["test"], expected: "test_en" },
+      { args: ["test.length"], expected: "test_length" },
+      { args: ["test.search"], expected: "test_search" },
     ];
 
-    tests.forEach(test => {
-      it('correctly translates for ' + JSON.stringify(test.args) + ' args', () => {
+    tests.forEach((test) => {
+      it("correctly translates for " + JSON.stringify(test.args) + " args", () => {
         expect(t.translate(...test.args)).to.eql(test.expected);
       });
     });
