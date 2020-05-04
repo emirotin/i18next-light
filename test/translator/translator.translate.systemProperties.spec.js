@@ -1,5 +1,4 @@
 import Translator from '../../src/Translator';
-import ResourceStore from '../../src/ResourceStore.js';
 import Interpolator from '../../src/Interpolator';
 
 // These tests orignated from issues:
@@ -16,45 +15,24 @@ describe('Translator', () => {
     let t;
 
     before(() => {
-      const rs = new ResourceStore({
-        en: {
-          translation: {
-            test: {
-              length: 'test_length',
-              search: 'test_search',
-            },
-          },
-        },
-        de: {
-          translation: {
-            test: 'test_de',
-          },
+      t = Translator(Interpolator(), {
+        resources: {
+          test: 'test_en',
+          'test.length': 'test_length',
+          'test.search': 'test_search',
         },
       });
-      t = new Translator(
-        {
-          interpolator: new Interpolator(),
-        },
-        {
-          interpolation: {
-            interpolateResult: true,
-            interpolateDefaultValue: true,
-            interpolateKey: true,
-          },
-        },
-      );
-      t.changeLanguage('de');
     });
 
-    var tests = [
-      { args: ['test', { lng: 'de', nsSeparator: '.' }], expected: 'test_de' },
-      { args: ['test.length', { lng: 'de', nsSeparator: '.' }], expected: 'test_length' },
-      { args: ['test.search', { lng: 'de', nsSeparator: '.' }], expected: 'test_search' },
+    const tests = [
+      { args: ['test'], expected: 'test_en' },
+      { args: ['test.length'], expected: 'test_length' },
+      { args: ['test.search'], expected: 'test_search' },
     ];
 
     tests.forEach(test => {
       it('correctly translates for ' + JSON.stringify(test.args) + ' args', () => {
-        expect(t.translate.apply(t, test.args)).to.eql(test.expected);
+        expect(t.translate(...test.args)).to.eql(test.expected);
       });
     });
   });

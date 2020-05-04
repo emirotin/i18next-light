@@ -1,45 +1,40 @@
-import i18next from '../src/i18next.js';
-
-const instance = i18next.createInstance();
+import i18next from '../src/index.js';
 
 describe('i18next.translation.formatting', () => {
-  before(done => {
-    instance.init(
-      {
-        lng: 'en',
-        resources: {
-          oneFormatterTest: 'The following text is uppercased: $t(key5, uppercase)',
-          anotherOneFormatterTest: 'The following text is underscored: $t(key6, underscore)',
-          twoFormattersTest:
-            'The following text is uppercased: $t(key5, uppercase). The following text is underscored: $t(key5, underscore)',
-          twoFormattersTogetherTest:
-            'The following text is uppercased, underscored, then uri component encoded: $t(key7, uppercase, underscore, encodeuricomponent)',
-          oneFormatterUsingAnotherFormatterTest:
-            'The following text is lowercased: $t(twoFormattersTogetherTest, lowercase)',
-          missingTranslationTest:
-            'No text will be shown when the translation key is missing: $t(, uppercase)',
-          key5: 'Here is some text',
-          key6: 'Here is some text with numb3r5',
-          key7: 'Here is some: text? with, (punctuation)',
-          withSpace: ' there',
-          keyWithNesting: 'hi$t(withSpace)',
-        },
-        interpolationFormat: (value, format, _lng) => {
-          if (format === 'uppercase') return value.toUpperCase();
-          if (format === 'lowercase') return value.toLowerCase();
-          if (format === 'underscore') return value.replace(/\s+/g, '_');
-          if (format === 'encodeuricomponent') return encodeURIComponent(value);
-          return value;
-        },
+  let i18n;
+
+  before(() => {
+    i18n = i18next({
+      lng: 'en',
+      resources: {
+        oneFormatterTest: 'The following text is uppercased: $t(key5, uppercase)',
+        anotherOneFormatterTest: 'The following text is underscored: $t(key6, underscore)',
+        twoFormattersTest:
+          'The following text is uppercased: $t(key5, uppercase). The following text is underscored: $t(key5, underscore)',
+        twoFormattersTogetherTest:
+          'The following text is uppercased, underscored, then uri component encoded: $t(key7, uppercase, underscore, encodeuricomponent)',
+        oneFormatterUsingAnotherFormatterTest:
+          'The following text is lowercased: $t(twoFormattersTogetherTest, lowercase)',
+        missingTranslationTest:
+          'No text will be shown when the translation key is missing: $t(, uppercase)',
+        key5: 'Here is some text',
+        key6: 'Here is some text with numb3r5',
+        key7: 'Here is some: text? with, (punctuation)',
+        withSpace: ' there',
+        keyWithNesting: 'hi$t(withSpace)',
       },
-      () => {
-        done();
+      interpolationFormat: (value, format, _lng) => {
+        if (format === 'uppercase') return value.toUpperCase();
+        if (format === 'lowercase') return value.toLowerCase();
+        if (format === 'underscore') return value.replace(/\s+/g, '_');
+        if (format === 'encodeuricomponent') return encodeURIComponent(value);
+        return value;
       },
-    );
+    });
   });
 
   describe('formatting', () => {
-    var tests = [
+    const tests = [
       {
         args: ['oneFormatterTest'],
         expected: 'The following text is uppercased: HERE IS SOME TEXT',
@@ -75,7 +70,7 @@ describe('i18next.translation.formatting', () => {
 
     tests.forEach(test => {
       it('correctly formats translations for ' + JSON.stringify(test.args), () => {
-        expect(instance.t.apply(instance, test.args)).to.eql(test.expected);
+        expect(i18n.t(...test.args)).to.eql(test.expected);
       });
     });
   });

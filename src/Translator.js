@@ -6,6 +6,7 @@ const contextSeparator = '_';
 const Translator = (interpolator, options = {}) => {
   const logger = baseLogger.create('translator');
   const topOptions = options;
+  const resources = options.resources || {};
 
   const resolve = (keys, options = {}) => {
     if (typeof keys === 'string') {
@@ -42,7 +43,7 @@ const Translator = (interpolator, options = {}) => {
       }
 
       for (const keyVariant of keyVariants.reverse()) {
-        const res = topOptions.resources[keyVariant];
+        const res = resources[keyVariant];
 
         if (res !== undefined) {
           return { res, usedKey: key, exactUsedKey: keyVariant };
@@ -53,7 +54,7 @@ const Translator = (interpolator, options = {}) => {
 
   const exists = (key, options) => {
     const resolved = resolve(key, options);
-    return resolved && resolved.res !== undefined;
+    return (resolved && resolved.res !== undefined) || false;
   };
 
   const translate = (keys, options = {}) => {
@@ -79,7 +80,9 @@ const Translator = (interpolator, options = {}) => {
       typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
     if (res && handleAsObject && noObject.indexOf(resType) < 0) {
       logger.warn('accessing an object');
-      return `key '${key} (${topOptions.lng})' returned an object instead of string.`;
+      return `key '${keys[keys.length - 1]} (${
+        topOptions.lng
+      })' returned an object instead of string.`;
     } else {
       // string, empty or null
       let usedDefault = false;
@@ -97,11 +100,11 @@ const Translator = (interpolator, options = {}) => {
       }
       if (res === undefined) {
         usedKey = true;
-        res = key;
+        res = keys[keys.length - 1];
       }
 
       if (usedKey || usedDefault) {
-        logger.log('missingKey', topOptions.lng, key, res);
+        logger.log('missingKey', topOptions.lng, keys[keys.length - 1], res);
       }
 
       // extend

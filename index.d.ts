@@ -122,13 +122,24 @@ export class Translator {
 export type Newable<T> = { new (...args: any[]): T };
 
 export interface I18n {
-  // Expose the translator instance
+  /*
+   * Expose the options
+   */
+  options: TOptions;
+
+  /*
+   * Expose the translator instance
+   */
   interpolator: Interpolator;
 
-  // Expose the translator instance
+  /*
+   * Expose the translator instance
+   */
   translator: Translator;
 
-  // Expose parameterized t in the i18next interface hierarchy
+  /*
+   * Expose parameterized t in the i18next interface hierarchy
+   */
   t: TFunction;
 
   /**

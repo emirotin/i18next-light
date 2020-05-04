@@ -1,6 +1,7 @@
 import baseLogger from './logger.js';
 
 import Translator from './Translator.js';
+import Interpolator from './Interpolator.js';
 import languageUtils from './LanguageUtils.js';
 
 const defaults = {
@@ -87,6 +88,7 @@ const I18n = (options = {}) => {
   const translator = Translator(interpolator, options);
 
   return {
+    options,
     interpolator,
     translator,
     t: (...args) => translator.translate(...args),
