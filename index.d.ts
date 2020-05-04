@@ -79,38 +79,55 @@ export interface ExistsFunction<
   (key: TKeys | TKeys[], options?: TOptions<TInterpolationMap>): boolean;
 }
 
-export interface WithT {
-  // Expose parameterized t in the i18next interface hierarchy
-  t: TFunction;
-}
-
-export type TFunctionResult = string | object | Array<string | object> | undefined | null;
+export type TFunctionResult = string | undefined | null;
 export type TFunctionKeys = string | TemplateStringsArray;
 export interface TFunction {
   // basic usage
-  <TResult extends TFunctionResult = string, TInterpolationMap extends object = StringMap>(
+  <
+    TResult extends TFunctionResult = string,
+    TKeys extends TFunctionKeys = string,
+    TInterpolationMap extends object = StringMap
+  >(
     key: string | string[],
-    options?: TOptions<TInterpolationMap> | string,
+    options?: TOptions<TInterpolationMap>,
   ): TResult;
   // overloaded usage
-  <TResult extends TFunctionResult = string, TKeys extends TFunctionKeys = string>(
+  <
+    TResult extends TFunctionResult = string,
+    TKeys extends TFunctionKeys = string,
+    TInterpolationMap extends object = StringMap
+  >(
     key: TKeys | TKeys[],
     defaultValue?: string,
   ): TResult;
 }
 
-export class Interpolator {
-  constructor(options: I18nOptions);
-  reset(): undefined;
-  resetRegExp(): undefined;
+export interface Interpolator {
   interpolate(str: string, data: object, lng: string, options: TOptions): string;
   nest(str: string, t: (...args: any[]) => any, lng: string, options: TOptions): string;
+}
+
+export type InterpolatorFactory = (options: I18nOptions) => Interpolator;
+
+export class Translator {
+  exists(keys: string | string[], options: TOptions): boolean;
+  translate(keys: string | string[], options: TOptions): string;
+  resolve(
+    keys: string | string[],
+    options: TOptions,
+  ): { res: string; usedKey: string; exactUsedKey: string } | undefined;
 }
 
 // helper to identify class https://stackoverflow.com/a/45983481/2363935
 export type Newable<T> = { new (...args: any[]): T };
 
-export interface I18nT {
+export interface I18n {
+  // Expose the translator instance
+  interpolator: Interpolator;
+
+  // Expose the translator instance
+  translator: Translator;
+
   // Expose parameterized t in the i18next interface hierarchy
   t: TFunction;
 
@@ -125,6 +142,6 @@ export interface I18nT {
   dir(lng?: string): 'ltr' | 'rtl';
 }
 
-export type I18n = (options: I18nOptions) => I18nT;
+declare let i18next: (options?: I18nOptions) => I18n;
 
-export default I18n;
+export default i18next;
