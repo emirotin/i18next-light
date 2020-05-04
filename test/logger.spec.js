@@ -26,6 +26,10 @@ describe('logger', () => {
     logger.init(mockLogger, { debug: true });
   });
 
+  after(() => {
+    logger.init(undefined, { debug: false });
+  });
+
   describe('converting', () => {
     it('it should log', () => {
       expect(logger.log('hello').type).to.equal('log');

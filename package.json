@@ -72,7 +72,7 @@
     "watchify": "3.9.0"
   },
   "scripts": {
-    "_pretest": "npm run test:typescript && npm run test:typescript:noninterop",
+    "pretest": "npm run test:typescript && npm run test:typescript:noninterop",
     "test": "karma start karma.conf.js --singleRun",
     "test:typescript": "tslint --project tsconfig.json",
     "test:typescript:noninterop": "tslint --project tsconfig.nonEsModuleInterop.json",

@@ -1,4 +1,5 @@
-const consoleLogger = {
+export const consoleLogger = {
+  name: 'consoleLogger',
   log: (...args) => {
     console && console.log(...args);
   },
@@ -15,21 +16,25 @@ const consoleLogger = {
 const Logger = (concreteLogger = consoleLogger, options = {}) => {
   let logger, prefix, _options, debug;
 
-  const init = (concreteLogger = consoleLogger, options) => {
-    logger = concreteLogger;
+  const init = (concreteLogger, options) => {
+    logger = concreteLogger || consoleLogger;
     _options = options || _options;
     prefix = _options.prefix || 'i18next:';
     debug = _options.debug;
   };
 
-  const setDebug = bool => {
-    debug = bool;
+  const setDebug = _debug => {
+    debug = _debug;
   };
 
-  const forward = (args, lvl, extraPrefix, debugOnly) => {
-    if (debugOnly && !debug) return null;
+  const forward = (args, lvl, extraPrefix = '', debugOnly) => {
+    if (debugOnly && !debug) {
+      return;
+    }
     args = [...args];
-    if (typeof args[0] === 'string') args[0] = `${extraPrefix}${prefix} ${args[0]}`;
+    if (typeof args[0] === 'string') {
+      args[0] = `${extraPrefix}${prefix} ${args[0]}`;
+    }
     return logger[lvl](...args);
   };
 
@@ -43,7 +48,7 @@ const Logger = (concreteLogger = consoleLogger, options = {}) => {
 
   const create = moduleName =>
     Logger(logger, {
-      ...{ prefix: `${prefix}:${moduleName}:` },
+      prefix: `${prefix}:${moduleName}:`,
       ..._options,
     });
 
