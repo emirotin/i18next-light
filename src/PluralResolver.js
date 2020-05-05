@@ -1,7 +1,7 @@
 import baseLogger from "./logger.js";
 import languageUtils from "./LanguageUtils.js";
 
-import { rules } from "./PluralResolverData";
+import { rules } from "./PluralResolverData.js";
 
 const separator = "_";
 

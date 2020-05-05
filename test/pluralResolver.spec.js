@@ -1,4 +1,4 @@
-import pluralResolver from "../src/PluralResolver";
+import pluralResolver from "../src/PluralResolver.js";
 
 describe("PluralResolver", () => {
   describe("needsPlural()", () => {
