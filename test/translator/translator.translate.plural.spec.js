@@ -1,5 +1,5 @@
-import Translator from "../../src/Translator";
-import Interpolator from "../../src/Interpolator";
+import Translator from "../../src/Translator.js";
+import Interpolator from "../../src/Interpolator.js";
 
 describe("Translator", () => {
   describe("translate() with plural: en", () => {

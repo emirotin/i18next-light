@@ -1,5 +1,5 @@
-import Interpolator from "../src/Interpolator";
-import logger from "../src/logger";
+import Interpolator from "../src/Interpolator.js";
+import logger from "../src/logger.js";
 
 describe("Interpolator", () => {
   describe("interpolate()", () => {
@@ -252,9 +252,9 @@ describe("Interpolator", () => {
       it("correctly handles missing interpolation for " + JSON.stringify(test.args) + " args", () => {
         expect(ip.interpolate(...test.args)).to.eql(test.expected);
 
-        expect(logs).to.contain({
+        expect(logs).to.deep.include({
           type: "warn",
-          args: ["i18next::interpolator: " + test.warning],
+          args: ["i18next-light::interpolator: " + test.warning],
         });
       });
     });
