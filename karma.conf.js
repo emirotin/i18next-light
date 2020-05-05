@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = (karma) => {
   karma.set({
-    frameworks: ["mocha", "chai", "sinon"],
+    frameworks: ["mocha", "chai"],
 
     files: [
       // tests
