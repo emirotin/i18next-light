@@ -1,3 +1,8 @@
+# i18next-light: a lightweight companion for i18next
+
+<!-- toc -->
+<!-- tocstop -->
+
 # Differences
 
 Different API:
@@ -47,8 +52,6 @@ replace — unused, pass data inside of options
 
 Browserslist support: > 2 %, not dead
 
-# i18next-light: a lightweight companion for i18next
-
 [![CircleCI](https://circleci.com/gh/i18next/i18next.svg?style=svg)](https://circleci.com/gh/i18next/i18next)
 [![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/i18next/i18next)
 [![Package Quality](http://npm.packagequality.com/shield/i18next.svg)](http://packagequality.com/#?package=i18next)
@@ -57,8 +60,6 @@ Browserslist support: > 2 %, not dead
 [![David](https://img.shields.io/david/i18next/i18next.svg?style=flat-square)](https://david-dm.org/i18next/i18next)
 
 i18next is a very popular internationalization framework for browser or any other javascript environment (eg. node.js).
-
-![ecosystem](https://raw.githubusercontent.com/i18next/i18next/master/assets/i18next-ecosystem.jpg)
 
 i18next provides:
 
@@ -88,15 +89,3 @@ Our focus is providing the core to building a booming ecosystem. Independent of 
     <img src="https://raw.githubusercontent.com/i18next/i18next/master/assets/locize_sponsor_240.gif" width="240px">
   </a>
 </p>
-
----
-
-**From the creators of i18next: localization as a service - locize.com**
-
-A translation management system built around the i18next ecosystem - [locize.com](https://locize.com).
-
-![locize](https://locize.com/img/ads/github_locize.png)
-
-With using [locize](http://locize.com/?utm_source=i18next_readme&utm_medium=github) you directly support the future of i18next.
-
----
