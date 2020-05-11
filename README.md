@@ -1,6 +1,9 @@
 # i18next-light: a lightweight companion for i18next
 
 <!-- toc -->
+
+- [Differences](#differences)
+
 <!-- tocstop -->
 
 # Differences
