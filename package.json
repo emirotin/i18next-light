@@ -78,7 +78,7 @@
   "license": "MIT",
   "husky": {
     "hooks": {
-      "pre-commit": "markdown-toc -i README.md && lint-staged"
+      "pre-commit": "markdown-toc -i README.md && git add README.md && lint-staged"
     }
   },
   "lint-staged": {
