@@ -1,12 +1,9 @@
 test/
-coverage/
-assets/
 .circleci/
 .babelrc
 .editorconfig
 .eslintignore
-.eslintrc
+.eslin*
 .gitignore
 karma.conf.js
-.codeclimate.yml
-tsconfig.json
+tsconfig*

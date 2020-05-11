@@ -11,7 +11,5 @@
 *.swp
 
 
-# Ignore various Node.js related directories and files
 node_modules
-coverage/
 dist/
