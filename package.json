@@ -2,7 +2,7 @@
   "name": "@emirotin/i18next-light",
   "version": "1.0.0",
   "description": "i18next lightweight client-side companion",
-  "main": "./dist/cjs/i18next.js",
+  "main": "index.js",
   "module": "./src/index.js",
   "types": "./index.d.ts",
   "keywords": [

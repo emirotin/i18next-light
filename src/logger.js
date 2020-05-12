@@ -1,15 +1,15 @@
 export const consoleLogger = {
   name: "consoleLogger",
   log: (...args) => {
-    console && console.log(...args);
+    typeof console !== "undefined" && console.log(...args);
   },
 
   warn: (...args) => {
-    console && console.warn(...args);
+    typeof console !== "undefined" && console.warn(...args);
   },
 
   error: (...args) => {
-    console && console.error(...args);
+    typeof console !== "undefined" && console.error(...args);
   },
 };
 

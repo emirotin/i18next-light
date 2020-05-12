@@ -8,8 +8,9 @@ const defaults = {
   debug: false,
   resources: {},
   maxReplaces: 1000,
-  interpolationFormat: (value, _format, _lng, _options) => value,
+  interpolationFormat: (value, _format, _lng) => value,
   logger: undefined,
+  logPrefix: undefined,
 };
 
 const rtlLngs = [
@@ -77,7 +78,10 @@ const rtlLngs = [
 
 const I18n = (options = {}) => {
   options = { ...defaults, ...options };
-  baseLogger.init(options.logger, { debug: options.debug });
+  baseLogger.init(options.logger, {
+    debug: options.debug,
+    prefix: options.logPrefix,
+  });
 
   const logger = baseLogger;
 

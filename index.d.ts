@@ -107,7 +107,7 @@ export type InterpolatorFactory = (options: I18nOptions) => Interpolator;
 
 export class Translator {
   exists(keys: string | string[], options: TOptions): boolean;
-  translate(keys: string | string[], options: TOptions): string;
+  translate: TFunction;
   resolve(
     keys: string | string[],
     options: TOptions
