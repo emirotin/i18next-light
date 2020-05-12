@@ -70,7 +70,7 @@
     "test:typescript:noninterop": "eslint -c .eslintrc.ts.nonEsModuleInterop.js \"./**/*.ts\"",
     "tdd": "karma start karma.conf.js",
     "build": "rimraf dist && rollup -c && cpy \"./dist/umd/*.js\" ./",
-    "preversion": "run-s test build && git push",
+    "preversion": "run-s test build && git add dist i18next-light* && git push",
     "postversion": "git push && git push --tags",
     "prettify": "prettier --write \"{,**/}*.{ts,tsx,js,json,md}\""
   },
