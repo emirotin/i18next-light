@@ -1,6 +1,6 @@
 {
   "name": "@emirotin/i18next-light",
-  "version": "1.0.0",
+  "version": "1.0.1-0",
   "description": "i18next lightweight client-side companion",
   "main": "index.js",
   "module": "./src/index.js",
