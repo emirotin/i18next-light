@@ -2,8 +2,9 @@ test/
 .circleci/
 .babelrc
 .editorconfig
-.eslintignore
-.eslin*
+.prettier*
+.eslint*
 .gitignore
 karma.conf.js
 tsconfig*
+*.log
