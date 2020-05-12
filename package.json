@@ -70,7 +70,7 @@
     "test:typescript:noninterop": "eslint -c .eslintrc.ts.nonEsModuleInterop.js \"./**/*.ts\"",
     "tdd": "karma start karma.conf.js",
     "build": "rimraf dist && rollup -c && cpy \"./dist/umd/*.js\" ./",
-    "preversion": "run-s test build && git commit -am 'preversion build' && git push",
+    "preversion": "run-s test build && git commit -am 'preversion build' --allow-empty && git push",
     "postversion": "git push && git push --tags",
     "prettify": "prettier --write \"{,**/}*.{ts,tsx,js,json,md}\""
   },
@@ -78,7 +78,7 @@
   "license": "MIT",
   "husky": {
     "hooks": {
-      "pre-commit": "markdown-toc -i README.md && git add README.md && lint-staged"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
@@ -92,6 +92,9 @@
     ],
     "*.{json,md}": [
       "yarn prettify"
+    ],
+    "README.md": [
+      "markdown-toc -i"
     ]
   },
   "browserslist": [
