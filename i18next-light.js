@@ -7,13 +7,13 @@
   const consoleLogger = {
     name: "consoleLogger",
     log: (...args) => {
-      console && console.log(...args);
+      typeof console !== "undefined" && console.log(...args);
     },
     warn: (...args) => {
-      console && console.warn(...args);
+      typeof console !== "undefined" && console.warn(...args);
     },
     error: (...args) => {
-      console && console.error(...args);
+      typeof console !== "undefined" && console.error(...args);
     }
   };
 
@@ -619,8 +619,9 @@
     debug: false,
     resources: {},
     maxReplaces: 1000,
-    interpolationFormat: (value, _format, _lng, _options) => value,
-    logger: undefined
+    interpolationFormat: (value, _format, _lng) => value,
+    logger: undefined,
+    logPrefix: undefined
   };
   const rtlLngs = ["ar", "shu", "sqr", "ssh", "xaa", "yhd", "yud", "aao", "abh", "abv", "acm", "acq", "acw", "acx", "acy", "adf", "ads", "aeb", "aec", "afb", "ajp", "apc", "apd", "arb", "arq", "ars", "ary", "arz", "auz", "avl", "ayh", "ayl", "ayn", "ayp", "bbz", "pga", "he", "iw", "ps", "pbt", "pbu", "pst", "prp", "prd", "ur", "ydd", "yds", "yih", "ji", "yi", "hbo", "men", "xmn", "fa", "jpr", "peo", "pes", "prs", "dv", "sam"];
 
@@ -629,7 +630,8 @@
       ...options
     };
     baseLogger.init(options.logger, {
-      debug: options.debug
+      debug: options.debug,
+      prefix: options.logPrefix
     });
     const logger = baseLogger;
 
