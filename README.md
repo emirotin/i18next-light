@@ -39,7 +39,7 @@ yarn add i18next-light
   - [Custom formatting function](#custom-formatting-function)
   - [Custom logger contract](#custom-logger-contract)
 - [Browsers support](#browsers-support)
-- [Differences from the original library](#differences-from-the-original-library)
+- [Differences from the original `i18next`](#differences-from-the-original-i18next)
 
 <!-- tocstop -->
 
@@ -49,11 +49,11 @@ yarn add i18next-light
 
 [`i18next`](https://github.com/i18next/i18next) is a powerful tool that nicely handles many aspects of i18n: it handles namepsaces, multiple languages with fallbacks, interpolation, pluralization, nested translations, missing tanslations handling, etc.
 
-Unfortunately, it's not modular (as of the moment of `i18next-light` inception) and the bundled project has significant size (~44KiB minified but not gzipped).
+Unfortunately, it's not modular (as of the moment of `i18next-light` inception) and the bundled project has the significant size (~44KiB minified but not gzipped).
 
-I had a use-case where my website is mostly static and needs i18n support (build-time) while also having some dynamic parts that also need access to translated strings with interpolation.
+I had a use-case where my website is mostly static and needs i18n support (build-time) while also having some dynamic parts that also need access to the translated strings with interpolation.
 
-So I was happy to use `i18next` at build time but wasn't happy carying it over to the JS bundle let alone bundling all the i18n strings JSON where a single page may need 5 % or 10 % of them.
+So I was happy to use `i18next` at build time but wasn't happy carying it over to the JS bundle let alone bundling all the i18n strings JSON where a single page may need 5 % or at most 10 % of them.
 
 So this project was created — a much simpler and lighter (~8 KiB minified but not gzipped) library responsible for the following tasks only:
 
@@ -104,15 +104,17 @@ console.log(
 );
 ```
 
-This works greate with reactive soultions as well as you can directly use `t` in your render code or provide it as a filter.
+This way my JS is universal and language-agnostic, and only my HTML pages are different per language.
+
+This works great with reactive soultions as well as you can directly use `t` in your render code or provide it as a filter. For example, you can have proper pluralization with React by keeping the `count` in the component's state and using `t` in the render method. Or use svelte's `$` blocks to make the computed string based on the `count` variable.
 
 ### Will multi-language be implemented in the future?
 
-It may happen because I can imagine how this library can be useful in multi-language client-side scenario. At the same time there's no guarantees. If you have a good use-case please open an issue for discussion.
+It may happen because I can imagine how this library can be useful in multi-language client-side scenario. At the same time there's no guarantees as I don't need this right now and I want to keep the size minimal possible. If you have a good use-case please open an issue for discussion.
 
 ### Will there be namespaces implementation in the future?
 
-I don't think so. So far I see how namespaces work good whe the same resources are shared across multiple projects (I have such a use-case) but merging the namespaces is trivial (using `reduce`, for example) and can be handled in the userland.
+I don't think so. So far I see how namespaces work good when the same resources are shared across multiple projects (I have such a use-case) but merging the namespaces is trivial (using `reduce`, for example) and can be handled in the userland.
 
 ### Will there be more features added/returned?
 
@@ -120,13 +122,13 @@ Very unlikely. The sole purpose of this project is to nicely handle interpolatio
 
 ## How was this implemented
 
-I've first stripped all the functionality that I decided to drop (backend support, custom configuration options, namespaces, multilanguage, etc.) and simplifie the code by dropping the ever-false conditions.
+I've first stripped all the functionality that I decided to drop (backend support, custom configuration options, namespaces, multilanguage, etc.) and simplified the code by dropping the ever-false conditions.
 
 I have then rewritten the rest from classes to singleton objects (where no config nor state were left) and object factories.
 
 Then, I've improved the Babel transpilation by providing the `browserslist` config to avoid transpiling things that are natively supported by the modern browsers.
 
-I've removed the tests specific to the removed functionality and kept _all the rest_. The majority of them were left without changes, those were the functionality was changed — adapted and updated. At the time of creation there are _207 test-cases_ in this project.
+I've removed the tests specific to the removed functionality and kept _all the rest_. The majority of them were left without changes, those where the functionality was changed — adapted and updated. At the time of creation there are _207 test-cases_ in this project.
 
 I've also added Node.js testing in addition to the browser testing used in the original project (with Chrome/karma).
 
@@ -136,7 +138,7 @@ I've also removed the ES module transpilation, the original source code is the E
 
 The `.min.js` file in the original project is `44KiB`, the similar file in this project is around `8KiB`.
 
-It may not be a huge difference if your bundle is already over 1miB (which may be something to worry about in the first place) but for me it resulted in 2x bundle reduction for some pages, for example.
+It may not be a huge difference if your bundle is already over 1MiB (which may be something to worry about in the first place) but for me it resulted in 2x bundle reduction for some pages, for example.
 
 ## API
 
@@ -162,8 +164,8 @@ Or loading the UMD build in your browser:
 
 ```html
 <script src="/vendor/i18next-light.min.js"></script>
-<script src="/vendor/i18next-light.min.js">
-  const i18next = window['i18next-light']
+<script>
+  const i18next = window["i18next-light"];
 </script>
 ```
 
@@ -187,25 +189,25 @@ The factory method `i18next` accepts a single configuration parameter that can h
 | Option                | Required | Type       | Default                | Description                                                                                                                                  |
 | --------------------- | -------- | ---------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `lng`                 | Y        | `string`   | `undefined`            | The language of the resources, used to properly determine plural forms if they're used, also passed to the formatting function if it's used. |
-| `debug`               | N        | `boolean`  | `false`                | When `true` causes additional warnings printed to the console                                                                                |
-| `resources`           | Y        | `object`   | `{}`                   | The plain object (string key to string value mapping) defining the keys correspondance to the resources (translation strings)                |
-| `maxReplaces`         | N        | `number`   | `1000`                 | The max number of nested translation replaces, needed to prevent potential infinite loops.                                                   |
+| `resources`           | Y        | `object`   | `{}`                   | The plain object (string key to string value mapping) defining the keys correspondance to the resources (translation strings).               |
+| `debug`               | N        | `boolean`  | `false`                | When `true` causes the additional warnings printed to the console.                                                                           |
+| `maxReplaces`         | N        | `number`   | `1000`                 | The max number of nested translation replaces, needed to prevent the potential infinite loops. Most likely you don't need to change it.      |
 | `interpolationFormat` | N        | `function` | `value => value`       | The custom formatting function. See below for the contract description.                                                                      |
-| `logger`              | N        | `object`   | `console`-based logger | A custom logger can be provided for handling debug warnings. See below for the contract description.                                         |
-| `logPrefix`           | N        | `string`   | `"i18next-light:"`     | The string that is prepended to the first log argument (if it's a string)                                                                    |
+| `logger`              | N        | `object`   | `console`-based logger | A custom logger can be provided for handling the debug warnings. See below for the contract description.                                     |
+| `logPrefix`           | N        | `string`   | `"i18next-light:"`     | The string that is prepended to the first log argument (if it's also a string).                                                              |
 
 ### Instance properties and methods
 
 The instance returned from the `i18next` factory has the following properties and methods:
 
-| Property       | Type       | Description                                                                                                                                                                                         |
-| -------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `t`            | `function` | The main method, the translation function, see below.                                                                                                                                               |
-| `exists`       | `function` | The method that checks if there's a translation for the given key or a specific variant of it (taking into accountpluralization/context). The arguments are similar to the `t` function, see below. |
-| `dir`          | `function` | given the key code (like 'en' or 'ru-RU') returns `"rtl"` or `"ltr"` depending on the language read direction.                                                                                      |
-| `options`      | `object`   | The options object merged from the defaults and the initialization options                                                                                                                          |
-| `interpolator` | `object`   | The internal interpolator instance, see the [source code](https://github.com/emirotin/i18next-light/blob/master/src/Interpolator.js) if you need to use it directly.                                |
-| `translator`   | `object`   | The internal translator instance, see the [source code](https://github.com/emirotin/i18next-light/blob/master/src/Translator.js) if you need to use it directly.                                    |
+| Property       | Type       | Description                                                                                                                                                                                          |
+| -------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `t`            | `function` | The main method, the translation function, see below.                                                                                                                                                |
+| `exists`       | `function` | The method that checks if there's a translation for the given key or a specific variant of it (taking into account pluralization/context). The arguments are similar to the `t` function, see below. |
+| `dir`          | `function` | given the key code (like `"en"` or `"ru-RU"`) returns `"rtl"` or `"ltr"` depending on the language read direction.                                                                                   |
+| `options`      | `object`   | The options object merged from the defaults and the initialization options.                                                                                                                          |
+| `interpolator` | `object`   | The internal interpolator instance, see the [source code](https://github.com/emirotin/i18next-light/blob/master/src/Interpolator.js) if you need to use it directly.                                 |
+| `translator`   | `object`   | The internal translator instance, see the [source code](https://github.com/emirotin/i18next-light/blob/master/src/Translator.js) if you need to use it directly.                                     |
 
 ### Translation function (`i18n.t`)
 
@@ -235,12 +237,12 @@ For each key the following forms are checked in order:
 - with _plural_ only (if `count` is provided and the value of `count` requires the pluralized form for the provided `lng`),
 - the key itself.
 
-If no matching key is found and the default value is provided (as the 2nd string argument or as a `defaultValue` options) it will be returned, otherwise the last key is returned as the translation.
+If no matching key is found and the default value is provided (as the 2nd string argument or as a `defaultValue` option) it will be returned, otherwise the last key is returned as the translation (and a warning is printed).
 
 See the [original documentation](https://www.i18next.com/translation-function/essentials) for more details, it applies except for the following topics:
 
 - this library does not allow special handling for arrays and objects as translation results,
-- nested resources are not handled, each key is a string and the resource at that key must be a string.
+- deep resources object and the dot-separated deep keys are not handled, each key is a string and the resource at that key must be a string.
 
 ### Key existence function (`i18n.exists`)
 
@@ -252,9 +254,11 @@ i18n.exists(['key1', 'key2', ...])
 i18n.exists(['key1', 'key2', ...], { count: 1, context: 'boy' })
 ```
 
+Options other thn `count` and `context` have no effect.
+
 ### Custom formatting function
 
-Just like the original prject this library supports [formatting](https://www.i18next.com/translation-function/formatting) for the interpolated arguments.
+Just like the original project this library supports [formatting](https://www.i18next.com/translation-function/formatting) for the interpolated arguments.
 
 The signature of this function is `(value: any, format: string, lng: string) => string`.
 
@@ -298,12 +302,12 @@ const myFormatFunction = (value, format, lng) => {
 
 ### Custom logger contract
 
-The custom logger is a simple objct that must implement the 3 methods: `log`, `warn`, `error`. Each method should handle variable number of arguments.
+The custom logger is a simple object that must implement the 3 methods: `log`, `warn`, `error`. Each method should handle variable number of arguments.
 
 Example `console`-based logger implementation:
 
 ```javascript
-export const consoleLogger = {
+const consoleLogger = {
   name: "consoleLogger",
   log: (...args) => {
     typeof console !== "undefined" && console.log(...args);
@@ -331,29 +335,29 @@ This project is built with the following `browserslist` configuration:
 
 This allows for many ES6 features to be used natiely, like arrow functions, splats, etc.
 
-If you have any specific use case of a non-dead browser not handling this library proprly please raise an issue.
+If you have any specific use-case of a non-dead browser not handling this library properly please raise an issue.
 
-## Differences from the original library
+## Differences from the original `i18next`
 
 This library has the following differences compared to the original `i18next` project:
 
-- the initialization API is different, you pass the options to the factory method rather than using the `.init` call: `const i18n = i18next({ ... })`
+- the initialization API is different, you pass the options to the factory method rather than using the `.init` call: `const i18n = i18next({ ... })`,
 - there's no support for various backend implementations, you pass the `resources` as a plain object directly to the factory function,
-- it does not support multiple language, you determine the language-specific resources to be passed to it in your code (see the use-case above), as a result it also has no support for fallback language, languages array, `changeLanguage` methods, etc.,
+- it does not support multiple languages, you determine the language-specific resources to be passed to it in your code (see the use-case above), as a result it also has no support for fallback language, languages array, `changeLanguage` methods, whitelists, etc.,
 - it does not support namespaces, you need to merge your resources yourself before providing them,
 - it does not support saving the missing keys (because it has no backend), it will just report them in the `debug` mode,
 - it also does not have the special handling for the CI case, just provide an empty `resources` object there and you will get the keys as translations,
-- it always does plural suffix simplification — when like in English there are only two forms the keys checked are `key_plural` and `key` (otherwise the numeric suffixes are used, see [the originl docs](https://www.i18next.com/translation-function/plurals#languages-with-multiple-plurals)),
+- it always does plural suffix simplification — when like in English there are only two forms the keys checked are `key_plural` and `key` (otherwise the numeric suffixes are used, see [the original docs](https://www.i18next.com/translation-function/plurals#languages-with-multiple-plurals)),
 - it has no special handling for arrays and ojects as translation results,
 - it allows resources to be empty strings or `null`, which is also treated as an empty string,
-- it has no support for the legacy format (for interpolation and the like),
+- it has no support for the legacy formats (for interpolation and the like),
 - it doesn't support `defaultVariables`, if you need them merge your `t` options in your code,
-- neted keys (`key1.key2` as in `{ resources: { key1: { key2: 'translation here; } } }`) are not supported, flatten your resources before passing to the library,
-- `t` option `replace` is not used, pass the interpolation data directly in the `options` object as the 2nd arguement of `t`,
-- `t` options do not override anything passed when initialing the `i18n` object,
+- nested keys (`key1.key2` as in `{ resources: { key1: { key2: 'translation here; } } }`) are not supported, flatten your resources before passing to the library,
+- `t` option `replace` is not used, pass the interpolation data directly in the `options` object as the 2nd arguement of `t`: `t('key', { count: 1, total: 7 })`,
+- `t` options do not override anything passed when initialing the `i18n` object, like formatting function,
 - `options.interpolation.maxReplaces => options.maxReplaces`,
 - `options.interpolation.format => options.interpolationFormat`,
-- only default syntax is supported: `{{interpolation}}`, formatting is always `{{var, format}}`, nesting is always `$t()`, plural and context separator — always `_`.
+- only the default syntax is supported: interpolation is `{{var}}`, formatting is always `{{var, format}}`, nesting is always `$t()`, plural and context separator — always `_`,
 - reduced the browsers support to `> 2 %, not dead`.
 
 ---
