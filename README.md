@@ -5,14 +5,16 @@
 > `i18next-light` is a simplified and _much smaller_ version of `i18next` intended for the client-usage when you already have the prepackaged i18n strings.
 
 ```bash
-npm install --save i18next-light
+npm install --save @emirotin/i18next-light
 ```
 
 or
 
 ```bash
-yarn add i18next-light
+yarn add @emirotin/i18next-light
 ```
+
+or download `i18next-light.js` or `i18next-light.min.js` from https://github.com/emirotin/i18next-light.
 
 ---
 
